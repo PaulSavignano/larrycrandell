@@ -1,0 +1,34 @@
+{
+  "test": {
+    "PORT": 3001,
+    "MONGODB_URI": "mongodb://localhost:27017/redux-express-mongo-test",
+    "APP_NAME": "savignano.io",
+    "JWT_SECRET": "peppersavignano911",
+    "STRIPE_SK_TEST": "sk_test_4LkqFlzbpbVhqw1dO0ZNBk4O",
+    "GMAIL_USER": "paul.savignano@gmail.com",
+    "GMAIL_PASSWORD": "Carlsbad2015",
+    "GMAIL_CLIENT_ID": "309148916137-ej6baeelhgbmhevho1l2uier9ehf3haj.apps.googleusercontent.com",
+    "GMAIL_CLIENT_SECRET": "ohnIUjsskQx6x_thKXEDWwsq",
+    "GMAIL_REFRESH_TOKEN": "1/tvSaHy4wfz9SVs80wHH2tyJvbzNfEVgCsQhhwJMs0Nw",
+    "AWS_ACCESS_KEY_ID": "AKIAIO3XXXTIA6PCMATQ",
+    "AWS_SECRET_ACCESS_KEY": "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",
+    "AWS_S3_BUCKET": "savignano.io",
+    "MOVERBASE_KEY": "173dddf0cf15414ad35a2c86d2c7583f"
+  },
+  "development": {
+    "PORT": 3001,
+    "MONGODB_URI": "mongodb://localhost:27017/redux-express-mongo",
+    "APP_NAME": "savignano.io",
+    "JWT_SECRET": "peppersavignano911",
+    "STRIPE_SK_TEST": "sk_test_4LkqFlzbpbVhqw1dO0ZNBk4O",
+    "GMAIL_USER": "paul.savignano@gmail.com",
+    "GMAIL_PASSWORD": "Carlsbad2015",
+    "GMAIL_CLIENT_ID": "309148916137-ej6baeelhgbmhevho1l2uier9ehf3haj.apps.googleusercontent.com",
+    "GMAIL_CLIENT_SECRET": "ohnIUjsskQx6x_thKXEDWwsq",
+    "GMAIL_REFRESH_TOKEN": "1/tvSaHy4wfz9SVs80wHH2tyJvbzNfEVgCsQhhwJMs0Nw",
+    "AWS_ACCESS_KEY_ID": "AKIAIO3XXXTIA6PCMATQ",
+    "AWS_SECRET_ACCESS_KEY": "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",
+    "AWS_S3_BUCKET": "savignano.io",
+    "MOVERBASE_KEY": "173dddf0cf15414ad35a2c86d2c7583f"
+  }
+}
