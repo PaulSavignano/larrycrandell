@@ -35,7 +35,9 @@ footer {
   left: 0;
   text-align: center;
 }
-
+footer > a {
+  padding: 0 16px
+}
 
 
 
@@ -68,9 +70,7 @@ h3 {
   font-weight: normal
 }
 
-footer > a {
-  padding: 0 15px
-}
+
 
 .cards {
   flex: 1 1 auto;
