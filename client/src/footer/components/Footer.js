@@ -2,7 +2,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 import muiThemeable from 'material-ui/styles/muiThemeable'
-import Paper from 'material-ui/Paper'
 import FontIcon from 'material-ui/FontIcon'
 
 const Footer = ({ isFetching, brand, muiTheme }) => {
@@ -37,13 +36,13 @@ const Footer = ({ isFetching, brand, muiTheme }) => {
         { yelp ? <a href={yelp}><FontIcon className="fa fa-yelp" style={{ color: primary1Color }} /></a> : null }
         { youtube ? <a href={youtube}><FontIcon className="fa fa-youtube-play" style={{ color: primary1Color }} /></a> : null }
       </div>
-      <Paper style={{ backgroundColor: primary2Color, padding: '0 0 32px 0', color: textColor }}>
+      <div style={{ backgroundColor: primary2Color, padding: '0 0 32px 0', color: textColor }}>
         <div>{name} {new Date().getFullYear()}</div>
         { phone ? <div>{phone}</div> : null }
         { email ? <div>{email}</div> : null }
         { street ? <div>{street}</div> : null }
         { city ? <div>{city}, {state}. {zip}</div> : null }
-      </Paper>
+      </div>
     </footer>
   )
 }
