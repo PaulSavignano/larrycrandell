@@ -38,9 +38,6 @@ const renderTextField = ({ input, label, meta: { touched, error }, ...custom }) 
 class Signin extends Component {
   state = { open: false }
   handleClose = () => this.setState({open: false})
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.submitSucceeded) this.setState({ open: true })
-  }
   render() {
     const { dispatch, error, handleSubmit, submitting, user, muiTheme } = this.props
     const { primary1Color } = muiTheme.palette
@@ -48,7 +45,10 @@ class Signin extends Component {
       <section>
         <Card className="cards">
           <CardTitle title="Sign in" subtitle="Enter your information" />
-          <form onSubmit={handleSubmit(values => dispatch(fetchSignin(values)))}>
+          <form onSubmit={handleSubmit(values => {
+            dispatch(fetchSignin(values))
+            .then(() => this.setState({ open: true }))
+          })}>
             <CardText>
               <Field name="email" component={renderTextField} label="Email" fullWidth={true} />
               <Field name="password" component={renderTextField} label="Password" fullWidth={true} type="password" />
