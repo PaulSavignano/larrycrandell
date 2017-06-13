@@ -1,9 +1,12 @@
 import mongoose, { Schema } from 'mongoose'
 
+const s3Path = `${process.env.APP_NAME}/brand/image_`
+
 const BrandSchema = new Schema({
   image: { type: String, minlength: 1, trim: true },
   values: {
     name: { type: String, minlength: 1, trim: true, default: 'Brand' },
+    description: { type: String, minlength: 1, trim: true },
     phone: { type: String, minlength: 1, trim: true },
     email: { type: String, minlength: 1, trim: true },
     street: { type: String, minlength: 1, trim: true },
@@ -18,9 +21,14 @@ const BrandSchema = new Schema({
     twitter: { type: String, minlength: 1, trim: true },
     yelp: { type: String, minlength: 1, trim: true },
     youtube: { type: String, minlength: 1, trim: true },
+    mainColor: { type: String, minlength: 1, trim: true },
     fontFamily: { type: String, minlength: 1, trim: true, default: 'Roboto, sans-serif' },
     fontFamily2: { type: String, minlength: 1, trim: true, default: 'Roboto, sans-serif' },
     appBar: {
+      color: { type: String, minlength: 1, trim: true, default: '#ffffff' },
+      textColor: { type: String, minlength: 1, trim: true, default: 'rgba(0, 0, 0, 0.87)' }
+    },
+    footer: {
       color: { type: String, minlength: 1, trim: true, default: '#ffffff' },
       textColor: { type: String, minlength: 1, trim: true, default: 'rgba(0, 0, 0, 0.87)' }
     },
@@ -32,6 +40,7 @@ const BrandSchema = new Schema({
       accent2Color: { type: String, minlength: 1, trim: true, default: '#F5F5F5' },
       accent3Color: { type: String, minlength: 1, trim: true, default: '#9E9E9E' },
       textColor: { type: String, minlength: 1, trim: true, default: 'rgba(0, 0, 0, 0.87)' },
+      secondaryTextColor: { type: String, minlength: 1, trim: true, default: 'rgba(0, 0, 0, 0.87)' },
       alternateTextColor: { type: String, minlength: 1, trim: true, default: '#ffffff' },
       canvasColor: { type: String, minlength: 1, trim: true, default: '#ffffff' },
       borderColor: { type: String, minlength: 1, trim: true, default: '#E0E0E0' },
@@ -42,6 +51,15 @@ const BrandSchema = new Schema({
     }
   },
   createdAt: { type: Date, default: Date.now }
+})
+
+BrandSchema.pre('remove', function(next) {
+  const brand = this
+  if (brand.image) {
+    const Key = `${s3Path}${brand._id}`
+    deleteFile({ Key }).catch(err => console.log(err))
+  }
+  next()
 })
 
 const Brand = mongoose.model('Brand', BrandSchema)

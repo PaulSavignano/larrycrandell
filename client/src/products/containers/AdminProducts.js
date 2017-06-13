@@ -1,30 +1,25 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { compose } from 'redux'
-import muiThemeable from 'material-ui/styles/muiThemeable'
 
-import AdminProductList from '../components/AdminProductList'
 import AdminProductAdd from '../components/AdminProductAdd'
+import AdminProductList from '../components/AdminProductList'
 
+// Height is 56.25% of width
+// 900 x 600 = height of 66.67%
 const imageSize = {
-  width: 900,
-  height: 600
+  width: 1012,
+  height: 675
 }
-const placeholdIt = `https://placehold.it/${imageSize.width}x${imageSize.height}`
 
-const AdminProducts = ({ isFetching, items, muiTheme }) => (
-  isFetching ? null :
-  <section>
-    <h1 style={{ fontFamily: muiTheme.fontFamily }}>Products Admin</h1>
-    <AdminProductAdd imageSize={imageSize} placeholdIt={placeholdIt} />
-    <AdminProductList items={items} imageSize={imageSize} placeholdIt={placeholdIt} />
-  </section>
-)
+const AdminProducts = ({ isFetching, section, products }) => {
+  return (
+    isFetching ? null :
+      <AdminProductList section={section} products={products} imageSize={imageSize} />
+  )
+}
 
-const mapStateToProps = ({ products }) => ({
-  isFetching: products.isFetching,
-  items: products.items
+const mapStateToProps = (state, ownProps) => ({
+  isFetching: state.products.isFetching
 })
 
-
-export default compose(connect(mapStateToProps), muiThemeable())(AdminProducts)
+export default connect(mapStateToProps)(AdminProducts)

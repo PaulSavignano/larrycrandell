@@ -55,7 +55,20 @@ pages.get('/:_id', (req, res) => {
 
 
 // Update
-
+pages.patch('/:_id', (req, res) => {
+  const _id = req.params._id
+  if (!ObjectID.isValid(_id)) return res.status(404).send()
+  const { name } = req.body
+  console.log(req.body)
+  Page.findOneAndUpdate({ _id }, { $set: { name }}, { new: true })
+    .then(doc => {
+      res.send(doc)
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(400).send(err)
+    })
+  })
 
 
 
@@ -64,8 +77,10 @@ pages.get('/:_id', (req, res) => {
 pages.delete('/:_id', authenticate(['admin']), (req, res) => {
   const _id = req.params._id
   if (!ObjectID.isValid(_id)) return res.status(404).send()
-  Page.findOneAndRemove({ _id,})
-    .then((page) => res.send(page))
+  Page.findOne({ _id,})
+    .then(page => {
+      page.remove().then(page => res.send(page).catch(err => console.log(err)))
+    })
     .catch((err) => res.status(400).send(err))
 })
 

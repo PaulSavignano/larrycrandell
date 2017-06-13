@@ -7,9 +7,11 @@ const OrderSchema = new Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true },
-  phone: { type: String, required: true },
+  shipped: { type: Boolean },
+  shipDate: { type: Date },
   address: {
     name: { type: String },
+    phone: { type: String },
     street: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },

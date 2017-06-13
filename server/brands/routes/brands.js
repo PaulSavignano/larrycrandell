@@ -47,15 +47,16 @@ brands.patch('/:_id', authenticate(['admin']), (req, res) => {
   const _id = req.params._id
   if (!ObjectID.isValid(_id)) return res.status(404).send()
   const { type, image, values } = req.body
+  const Key = `${s3Path}${_id}`
   const newValues = !values ? null : {
     name: values.name,
+    description: values.description,
     phone: values.phone,
     email: values.email,
     street: values.street,
     city: values.city,
     state: values.state,
     zip: values.zip,
-    fontFamily: values.fontFamily,
     facebook: values.facebook,
     github: values.github,
     google: values.google,
@@ -64,9 +65,16 @@ brands.patch('/:_id', authenticate(['admin']), (req, res) => {
     twitter: values.twitter,
     yelp: values.yelp,
     youtube: values.youtube,
+    mainColor: values.mainColor,
+    fontFamily: values.fontFamily,
+    fontFamily2: values.fontFamily2,
     appBar: {
       color: values.appBarColor,
       textColor: values.appBarTextColor,
+    },
+    footer: {
+      color: values.footerColor,
+      textColor: values.footerTextColor
     },
     palette: {
       primary1Color: values.primary1Color,
@@ -76,6 +84,7 @@ brands.patch('/:_id', authenticate(['admin']), (req, res) => {
       accent2Color: values.accent2Color,
       accent3Color: values.accent3Color,
       textColor: values.textColor,
+      secondaryTextColor: values.secondaryTextColor,
       alternateTextColor: values.alternateTextColor,
       canvasColor: values.canvasColor,
       borderColor: values.borderColor,
@@ -87,7 +96,7 @@ brands.patch('/:_id', authenticate(['admin']), (req, res) => {
   }
   switch (type) {
     case 'UPDATE_IMAGE':
-      uploadFile({ Key: `${s3Path}${_id}`, Body: image })
+      uploadFile({ Key }, image)
         .then(data => {
           const update = { image: data.Location }
           Brand.findOneAndUpdate({ _id }, { $set: update }, { new: true })
@@ -103,10 +112,14 @@ brands.patch('/:_id', authenticate(['admin']), (req, res) => {
             res.status(400).send(err)
           })
         })
+        .catch(err => {
+          console.log(err)
+          res.status(400).send(err)
+        })
       break
 
     case 'DELETE_IMAGE':
-      deleteFile({ Key: `${s3Path}/${_id}` })
+      deleteFile({ Key })
         .then(() => {
           const update = { image: null }
           Brand.findOneAndUpdate({ _id }, { $set: update }, { new: true })
@@ -124,10 +137,9 @@ brands.patch('/:_id', authenticate(['admin']), (req, res) => {
         })
       break
 
-    case 'UPDATE_ITEM':
+    case 'UPDATE_VALUES':
       Brand.findOneAndUpdate({ _id }, { $set: { values: newValues }}, { new: true })
         .then(doc => {
-          console.log(doc)
           res.send(doc)
         })
         .catch(err => {
@@ -148,7 +160,7 @@ brands.patch('/:_id', authenticate(['admin']), (req, res) => {
 brands.delete('/:_id', authenticate(['admin']), (req, res) => {
   const _id = req.params._id
   if (!ObjectID.isValid(_id)) return res.status(404).send()
-  Brand.findOneAndRemove({ _id,})
+  Brand.findOne({ _id })
     .then(_id => res.send(_id))
     .catch(err => res.status(400).send(err))
 })

@@ -1,5 +1,6 @@
 import React from 'react'
 import { Router, Route, IndexRoute } from 'react-router'
+import ReactGA from 'react-ga'
 
 import App from './App'
 
@@ -17,28 +18,30 @@ import Signup from './users/components/Signup'
 import Signin from './users/components/Signin'
 import Recovery from './users/components/Recovery'
 import Reset from './users/components/Reset'
-import Contact from './users/components/Contact'
 import Profile from './users/containers/Profile'
 import RequestEstimate from './users/components/RequestEstimate'
 
 // Product
-import Products from './products/containers/Products'
 import Product from './products/containers/Product'
-import AdminProducts from './products/containers/AdminProducts'
-
-// Cart
-import Cart from './carts/containers/Cart'
 
 //Order
 import OrderAdd from './orders/containers/OrderAdd'
 import Orders from './orders/containers/Orders'
 import OrderConfirmation from './orders/containers/OrderConfirmation'
 import OrderDetail from './orders/containers/OrderDetail'
+import AdminOrders from './orders/containers/AdminOrders'
+import AdminOrderDetail from './orders/containers/AdminOrderDetail'
 
 import NotFound from './NotFound'
 
+ReactGA.initialize('UA-100349397-1')
+const logPageView = () => {
+  ReactGA.set({ page: window.location.pathname + window.location.search })
+  ReactGA.pageview(window.location.pathname + window.location.search)
+}
+
 const Routing = ({ history }) => (
-  <Router history={history}>
+  <Router history={history} onUpdate={logPageView}>
     <Route path="/" component={App}>
 
       {/* Page */}
@@ -64,9 +67,11 @@ const Routing = ({ history }) => (
       <Route path="user/request-estimate" component={RequestEstimate} />
 
       {/* Product */}
-      <Route path="product/:slug" component={Product} />
-      <Route path="admin/products" component={RequireAuth(AdminProducts, ['admin'])} />
+      <Route path="products/:productId" component={Product} />
 
+      {/* Orders */}
+      <Route path="admin/orders" component={RequireAuth(AdminOrders, ['admin'])} />
+      <Route path="admin/orders/:orderId" component={RequireAuth(AdminOrderDetail, ['admin'])} />
 
       <Route path='*' component={NotFound} />
     </Route>

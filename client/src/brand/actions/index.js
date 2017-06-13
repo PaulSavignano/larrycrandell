@@ -62,7 +62,6 @@ export const fetchBrand = () => {
         dispatch(fetchBrandSuccess(json[0]))
       })
       .catch(err => {
-        console.log(err)
         dispatch(fetchBrandFailure(err))
       })
   }

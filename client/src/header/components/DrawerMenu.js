@@ -2,13 +2,11 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 import MenuItem from 'material-ui/MenuItem'
-import { List, ListItem } from 'material-ui/List'
-import {spacing, typography, zIndex} from 'material-ui/styles'
+import { ListItem } from 'material-ui/List'
+import { spacing, typography } from 'material-ui/styles'
 
 import { fetchAdd } from '../../brand/actions/index'
 import SigninSignout from '../../users/components/SigninSignout'
-
-
 
 const DrawerMenu = ({ dispatch, brand, pages, user, handleClose, hasProducts }) => {
   const isAdmin = user.roles.find(role => role === 'admin') ? true : false
@@ -73,13 +71,6 @@ const DrawerMenu = ({ dispatch, brand, pages, user, handleClose, hasProducts }) 
         }}>{page.name}</MenuItem>
       ))}
 
-      {!hasProducts ? null :
-        <MenuItem onTouchTap={() => {
-          dispatch(push('/products'))
-          handleClose()
-        }}>Products</MenuItem>
-      }
-
       <MenuItem onTouchTap={() => {
         dispatch(push('/contact'))
         handleClose()
@@ -114,9 +105,9 @@ const DrawerMenu = ({ dispatch, brand, pages, user, handleClose, hasProducts }) 
             />,
             <ListItem
               key={3}
-              primaryText="Products"
+              primaryText="Orders"
               onTouchTap={() => {
-                dispatch(push(`/admin/products`))
+                dispatch(push(`/admin/orders`))
                 handleClose()
               }}
             />

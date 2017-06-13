@@ -23,11 +23,14 @@ html {
 body {
   position: relative;
   margin: 0;
-  padding-bottom: 6rem;
   min-height: 100%;
-  font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
+
+
+
+
+/* Footer */
 footer {
   position: absolute;
   right: 0;
@@ -36,7 +39,9 @@ footer {
   text-align: center;
 }
 footer > div > a {
-  padding: 0 16px
+  padding: 0 16px;
+  text-decoration: none;
+  color: inherit;
 }
 
 
@@ -47,13 +52,16 @@ footer > div > a {
 
 
 main {
-  margin-bottom: 96px;
+  padding: 0 0 192px 0;
+  min-height: 100vh;
 }
+
 
 /* maring: 32px */
 section {
   max-width: 1044px;
-  margin: 64px auto;
+  padding: 16px 0 0 0;
+  margin: 0 auto;
 }
 
 section > h1 {
@@ -65,9 +73,20 @@ h1 {
   font-size: 2em;
 }
 
+h2 {
+  font-weight: normal;
+}
+
 h3 {
   margin: 32px;
   font-weight: normal
+}
+
+.delete-button > button {
+  background-color: rgb(213, 0, 0) !important;
+}
+.delete-button:hover > button {
+  background-color: rgba(213, 0, 0, 0.6) !important;
 }
 
 
@@ -75,7 +94,6 @@ h3 {
 .cards {
   flex: 1 1 auto;
   margin: 16px;
-  height: 100%;
 }
 
 .fa.fa-shopping-cart {
@@ -147,4 +165,17 @@ h3 {
 .exp-cvc {
   margin-bottom: 8px;
   span:first-child { margin-right: 16px; }
+}
+
+
+
+
+
+
+
+
+
+
+.RichTextEditor__root___2QXK- {
+  background: none !important;
 }

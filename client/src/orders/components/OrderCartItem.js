@@ -5,7 +5,7 @@ import {Card } from 'material-ui/Card'
 
 import formatPrice from '../../modules/formatPrice'
 
-class CartItem extends Component {
+class OrderCartItem extends Component {
   state = {
     src: '',
     zDepth: 1
@@ -13,15 +13,18 @@ class CartItem extends Component {
   handleMouseEnter = () => this.setState({ zDepth: 4 })
   handleMouseLeave = () => this.setState({ zDepth: 1 })
   render() {
-    const { item } = this.props
-    const { dispatch, _id, productQty, name, price, image, total } = item
+    const { dispatch, item } = this.props
+    const { productId, productQty, name, price, image, total } = item
     return (
       <Card
-        onTouchTap={() => dispatch(push(`/product/${_id}`))}
+        zDepth={this.state.zDepth}
+        onMouseEnter={this.handleMouseEnter}
+        onMouseLeave={this.handleMouseLeave}
+        onTouchTap={() => dispatch(push(`/products/${productId}`))}
         className="cards"
       >
         <div style={{ display: 'flex', flexFlow: 'row nowrap' }}>
-          <img src={image} alt="" width="100" height="100"/>
+          <img src={image} alt="" width="auto" height="100px"/>
           <div style={{
             display: 'flex',
             flexFlow: 'row wrap',
@@ -43,4 +46,4 @@ class CartItem extends Component {
 }
 
 
-export default connect()(CartItem)
+export default connect()(OrderCartItem)

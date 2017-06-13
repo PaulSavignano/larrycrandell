@@ -5,7 +5,7 @@ import authenticate from '../../middleware/authenticate'
 import { uploadFile, deleteFile } from '../../middleware/s3'
 import slugIt from '../../middleware/slugIt'
 import Product from '../models/Product'
-
+import Section from '../../sections/models/Section'
 
 const products = express.Router()
 
@@ -13,39 +13,26 @@ const s3Path = `${process.env.APP_NAME}/products`
 
 // Create
 products.post('/', (req, res) => {
-  const { type, image, values } = req.body
-  const _id = new ObjectID()
+  const { sectionId } = req.body
   const product = new Product({
-    _id,
-    slug: slugIt(values.name),
-    image,
-    values
+    sectionId: ObjectID(sectionId),
+    image: null,
+    values: []
   })
-  switch (type) {
-    case 'ADD_ITEM_ADD_IMAGE':
-    uploadFile({ Key: `${s3Path}/${_id}`, Body: image })
-      .then(data => {
-        product.image = data.Location
-        product.save()
-          .then(doc => {
-              res.send(doc)
-            })
-          .catch(err => {
-            console.log(err)
-            res.status(400).send(err)
-          })
-      })
-      break
-    case 'ADD_ITEM':
-      product.save()
-        .then(doc => res.send(doc))
+  product.save()
+    .then(product => {
+      Section.findOneAndUpdate({ _id: sectionId }, { $push: { components: { productId: product._id }}, $set: { componentType: 'Product' }}, { new: true })
+        .then(section => {
+          res.send({ product, section })
+        })
         .catch(err => {
           console.log(err)
           res.status(400).send(err)
         })
-    default:
-      return
-  }
+    })
+    .catch(err => {
+      res.status(400).send(err)
+    })
 })
 
 
@@ -72,12 +59,13 @@ products.patch('/:_id', (req, res) => {
   const _id = req.params._id
   if (!ObjectID.isValid(_id)) return res.status(404).send()
   const { type, image, values } = req.body
+  const Key = `${s3Path}/${_id}`
   switch (type) {
 
-    case 'UPDATE_ITEM_UPDATE_IMAGE':
-      uploadFile({ Key: `${s3Path}/${_id}`, Body: image })
+    case 'UPDATE_IMAGE':
+      uploadFile({ Key }, image)
         .then(data => {
-          const update = { image: data.Location, values, slug: slugIt(values.name) }
+          const update = { image: data.Location }
           Product.findOneAndUpdate({ _id }, { $set: update }, { new: true })
             .then(doc => {
               res.send(doc)
@@ -90,10 +78,10 @@ products.patch('/:_id', (req, res) => {
         })
       break
 
-    case 'UPDATE_ITEM_DELETE_IMAGE':
-      deleteFile({ Key: `${s3Path}/${_id}` })
+    case 'DELETE_IMAGE':
+      deleteFile({ Key })
         .then(() => {
-          const update = { image: null, values, slug: slugIt(values.name) }
+          const update = { image: null }
           Product.findOneAndUpdate({ _id }, { $set: update }, { new: true })
             .then(doc => {
               res.send(doc)
@@ -106,8 +94,8 @@ products.patch('/:_id', (req, res) => {
         })
       break
 
-    case 'UPDATE_ITEM':
-      Product.findOneAndUpdate({ _id }, { $set: { values: values, slug: slugIt(values.name) }}, { new: true })
+    case 'UPDATE_VALUES':
+      Product.findOneAndUpdate({ _id }, { $set: { values, slug: slugIt(values.name) }}, { new: true })
         .then(doc => {
           res.send(doc)
         })
@@ -125,29 +113,24 @@ products.patch('/:_id', (req, res) => {
 
 
 // Delete
-products.delete('/:_id', (req, res) => {
+
+products.delete('/:_id', authenticate(['admin']), (req, res) => {
   const _id = req.params._id
   if (!ObjectID.isValid(_id)) return res.status(404).send()
-  Product.findOne({ _id })
-    .then(doc => {
-      if (doc.image) {
-        deleteFile({ Key: `${s3Path}/${_id}` })
-          .then(() => {
-            Product.findOneAndRemove({ _id })
-              .then(doc => res.send(doc))
-              .catch(err => {
-                console.log(err)
-                res.status(400).send(err)
-              })
-          })
-      } else {
-        Product.findOneAndRemove({ _id,})
-          .then(doc => res.send(doc))
-          .catch(err => {
-            console.log(err)
-            res.status(400).send(err)
-          })
-      }
+  Product.findOneAndRemove({ _id })
+    .then(product => {
+      Section.findOneAndUpdate({ _id: product.sectionId }, { $pull: { components: { productId: product._id }}}, { new: true })
+        .then(section => {
+          res.send({ product, section })
+        })
+        .catch(err => {
+          console.log(err)
+          res.status(400).send(err)
+        })
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(400).send(err)
     })
 })
 
