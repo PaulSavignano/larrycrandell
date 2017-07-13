@@ -9,15 +9,15 @@ import Routing from './Routing'
 import './index.css'
 
 // Actions
-import { fetchCards } from './cards/actions/index'
-import { fetchCart } from './carts/actions/index'
-import { fetchCarousels } from './carousels/actions/index'
-import { fetchSections } from './sections/actions/index'
-import { fetchOrders } from './orders/actions/index'
-import { fetchPages } from './pages/actions/index'
-import { fetchProducts } from './products/actions/index'
-import { fetchUser } from './users/actions/index'
-import { fetchBrand } from './brand/actions/index'
+import { fetchBrand } from './actions/brand'
+import { fetchCards } from './actions/cards'
+import { fetchCart } from './actions/cart'
+import { fetchSlides } from './actions/slides'
+import { fetchSections } from './actions/sections'
+import { fetchOrders } from './actions/orders'
+import { fetchPages } from './actions/pages'
+import { fetchProducts } from './actions/products'
+import { fetchUser } from './actions/users'
 
 const store = configureStore()
 const history = syncHistoryWithStore(browserHistory, store)
@@ -34,13 +34,12 @@ if (cart) {
   store.dispatch(fetchCart(cart))
 }
 
+store.dispatch(fetchBrand())
 store.dispatch(fetchCards())
-store.dispatch(fetchCarousels())
-store.dispatch(fetchSections())
 store.dispatch(fetchPages())
 store.dispatch(fetchProducts())
-store.dispatch(fetchBrand())
-
+store.dispatch(fetchSections())
+store.dispatch(fetchSlides())
 
 ReactDOM.render(
   <Provider store={store}>

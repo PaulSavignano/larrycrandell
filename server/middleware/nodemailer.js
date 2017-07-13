@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer'
 
-import Brand from '../brands/models/Brand'
+import Brand from '../models/Brand'
 
 const transporter = nodemailer.createTransport({
   service: "Gmail",
@@ -18,37 +18,36 @@ const transporter = nodemailer.createTransport({
 export const sendEmail1 = (mail) => {
   const { to, toSubject, toBody, fromSubject, fromBody } = mail
   return Brand.findOne({})
-    .then(doc => {
-      const brand = `
-      ${doc.image ? `<img src=${doc.image} alt="item" height="64px" width="auto"/>` : `<div>${doc.name}</div>`}
+    .then(brand => {
+      if (!brand) return Promise.reject({ error: 'No brand found'})
+      const { image, business } = brand
+      const { name, phone, email, street, city, state, zip } = business
+      const signature = `
+      ${image ? `<img src=${image.src} alt="item" height="64px" width="auto"/>` : `<div>${name}</div>`}
       <div>
         <a href="mailto:${process.env.GMAIL_USER}" style="color: black; text-decoration: none;">
           ${process.env.GMAIL_USER}
         </a>
       </div>
-      ${doc.values.street ? `<div>${doc.values.street}</div>` : ''}
-      ${doc.values.zip ? `<div>${doc.values.city} ${doc.values.state}, ${doc.values.zip}</div>` : ''}
+      ${street && `<div>${street}</div>`}
+      ${zip && `<div>${city} ${state}, ${zip}</div>`}
       `
       const userMail = {
         from: process.env.GMAIL_USER,
         to: to,
         subject: toSubject,
-        html: `${toBody}<br/>${brand}`
+        html: `${toBody}<br/>${signature}`
       }
       const adminMail = {
         from: process.env.GMAIL_USER,
         to: process.env.GMAIL_USER,
         subject: fromSubject,
-        html: `${fromBody}<br/>${brand}`
+        html: `${fromBody}<br/>${signature}`
       }
       transporter.sendMail(adminMail)
       return transporter.sendMail(userMail)
-        .then(info => {
-          return info
-        })
-        .catch(err => console.log(err))
+        .then(info => info)
+        .catch(err => console.error(err))
     })
-    .catch(err => {
-      console.log(err)
-    })
+    .catch(err => console.error(err))
 }
