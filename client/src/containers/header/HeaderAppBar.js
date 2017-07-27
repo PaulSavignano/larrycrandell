@@ -26,16 +26,17 @@ const HeaderAppBar = ({
 }) => (
   !isFetching &&
   <AppBar
+    zDepth={backgroundColor === 'transparent' ? 0 : 1}
+    iconStyleLeft={{ fill: color }}
     onLeftIconButtonTouchTap={() => dispatch(toggleDrawer())}
-    titleStyle={{ height: 64 }}
-    style={{ backgroundColor }}
+    titleStyle={{ height: 64, color }}
+    style={{ backgroundColor, color }}
     title={
       <nav>
         {search.searching ?
           <SearchBar />
         :
-        <div style={{ display: 'flex', flexFlow: 'row nowrap', justifyContent: 'space-between', alignItems: 'center' }}>
-          <HeaderBrand />
+        <div style={{ display: 'flex', flexFlow: 'row nowrap', justifyContent: 'flex-end', alignItems: 'center' }}>
           <span style={{ fontFamily }}>
             <span className="appbar-nav">
               {pages.filter(page => page.slug !== 'home').map(page => (
@@ -50,9 +51,11 @@ const HeaderAppBar = ({
             </span>
             <IconButton
               iconClassName="fa fa-search"
-              iconStyle={{ fontSize: 18, color }}
+              iconStyle={{ verticalAlign: 'bottom', fontSize: 16, color }}
               onTouchTap={() => dispatch(searchToggle(!search.searching))}
             />
+
+
             <HeaderUser fontFamily={fontFamily} />
             { !hasProducts ? null :
             <IconButton
@@ -71,7 +74,7 @@ const HeaderAppBar = ({
 
 const mapStateToProps = ({
   brand: {
-    appBar: { styles: { backgroundColor, navColor }},
+    appBar: { values: { backgroundColor, navColor }},
     isFetching,
     theme: { fontFamily, palette: { primary1Color } },
   },

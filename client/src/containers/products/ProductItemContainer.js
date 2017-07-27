@@ -1,15 +1,29 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Card, CardTitle } from 'material-ui/Card'
 
-import ProductItem from '../../components/products/ProductItem'
+import ProductItem from './ProductItem'
 
-const ProductItemContainer = ({ item, isFetching }) => (
-  !isFetching && <ProductItem item={item} />
-)
+const ProductItemContainer = ({ item, isFetching }) => {
+  return (
+    !isFetching && item ?
+    <ProductItem item={item} />
+    :
+    <Card className="section page">
+      <CardTitle title="That product is no longer "/>
+    </Card>
+  )
+}
 
-const mapStateToProps = ({ products: { items, isFetching } }, { componentId }) => ({
-  item: items.find(item => item._id === componentId),
-  isFetching
-})
+
+
+const mapStateToProps = ({ products: { items, isFetching } }, { componentId }) => {
+  console.log(componentId)
+  console.log(items.find(item => item._id === componentId))
+  return {
+    item: items.find(item => item._id === componentId),
+    isFetching
+  }
+}
 
 export default connect(mapStateToProps)(ProductItemContainer)

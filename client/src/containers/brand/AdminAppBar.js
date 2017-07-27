@@ -11,57 +11,61 @@ import { fetchUpdate } from '../../actions/brand'
 class AdminAppBar extends Component {
   state = {
     zDepth: 1,
-    editing: false
+    imageEdit: false
   }
   componentWillReceiveProps({ submitSucceeded }) {
-    if (submitSucceeded) this.setState({ editing: false })
+    if (submitSucceeded) this.setState({ imageEdit: false })
   }
   handleMouseEnter = () => this.setState({ zDepth: 4 })
   handleMouseLeave = () => this.setState({ zDepth: 1 })
-  editing = (bool) => this.setState({ editing: bool })
-  deleteImage = (_id, update) => this.props.dispatch(fetchUpdate(`appbar/${_id}`, update))
+  handleImageEdit = (bool) => this.setState({ imageEdit: bool })
+  handleImageDelete = (_id, update) => {
+    const { dispatch } = this.props
+    this.setState({ imageEdit: false })
+    return dispatch(fetchUpdate(`appbar/${_id}`, update))
+  }
   setEditorRef = (editor) => this.editor = editor
   render() {
     const {
       _id,
-      backgroundColor,
+      canvasColor,
       dispatch,
       error,
       fontFamily,
       handleSubmit,
       image,
-      imageSpec,
       isFetching,
       primary1Color,
       submitSucceeded,
       submitting
     } = this.props
+    console.log(image)
     return (
       !isFetching &&
       <Card
         zDepth={this.state.zDepth}
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
-        className="cards"
-        style={{ backgroundColor, fontFamily }}
+        className="card"
+        style={{ backgroundColor: canvasColor, fontFamily }}
       >
         <CardTitle
           title="AppBar"
         />
         <CardMedia>
           <ImageForm
-            imageSpec={imageSpec}
             image={image}
+            type="image/png"
             _id={_id}
-            editing={this.editing}
-            deleteImage={this.deleteImage}
-            style={{ fontFamily }}
+            onImageEdit={this.handleImageEdit}
+            onImageDelete={this.handleImageDelete}
+            style={{ fontFamily, backgroundColor: primary1Color, color: canvasColor }}
             ref={this.setEditorRef}
           />
         </CardMedia>
         <form onSubmit={handleSubmit((values) => {
           const path = `appbar/${_id}`
-          if (this.state.editing) {
+          if (this.state.imageEdit) {
             const img = this.editor.handleSave()
             return dispatch(fetchUpdate(path, { type: 'UPDATE_IMAGE_AND_VALUES', image: img, values }))
           }
@@ -69,6 +73,14 @@ class AdminAppBar extends Component {
         })}
         >
           <div className="field-container">
+            <Field
+              name="name"
+              label="name"
+              type="text"
+              component={renderTextField}
+              className="field"
+              style={{ fontFamily }}
+            />
             <Field
               name="backgroundColor"
               label="backgroundColor"
@@ -108,8 +120,9 @@ class AdminAppBar extends Component {
             <SuccessableButton
               submitSucceeded={submitSucceeded}
               submitting={submitting}
-              label="APPBAR"
-              style={{ fontFamily, backgroundColor: primary1Color }}
+              style={{ fontFamily, backgroundColor: primary1Color, color: canvasColor, margin: 4 }}
+              label="update appbar"
+              successLabel="appbar updated!"
             />
           </div>
         </form>
@@ -125,18 +138,18 @@ AdminAppBar = reduxForm({
 const mapStateToProps = ({
   brand: {
     _id,
-    appBar: { image, styles },
+    appBar: { image, values },
     isFetching,
     theme: { fontFamily, palette: { canvasColor, primary1Color },  }
   }
 }) => ({
   _id,
-  backgroundColor: canvasColor,
+  canvasColor,
   fontFamily,
   image,
-  initialValues: styles,
+  initialValues: values,
   isFetching,
-  primary1Color
+  primary1Color,
 })
 
 AdminAppBar = connect(mapStateToProps)(AdminAppBar)

@@ -6,23 +6,20 @@ import AdminMain from '../../containers/brand/AdminMain'
 import AdminTheme from '../../containers/brand/AdminTheme'
 import AdminFooter from '../../containers/brand/AdminFooter'
 
-// width: 256
-// height: 128
-const imageSpec = {
-  type: 'image/png',
-  width: 128,
-  height: 128
-}
-
 const AdminBrand = () => {
   return (
     <section>
       <br/>
-      <AdminBusiness /><br/>
-      <AdminAppBar imageSpec={imageSpec} /><br/>
-      <AdminMain /><br/>
-      <AdminTheme /><br/>
-      <AdminFooter imageSpec={imageSpec} /><br/>
+      <AdminBusiness />
+      <br/>
+      <AdminAppBar />
+      <br/>
+      <AdminMain />
+      <br/>
+      <AdminTheme />
+      <br/>
+      <AdminFooter />
+      <br/><br/>
     </section>
   )
 }

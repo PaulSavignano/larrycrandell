@@ -4,14 +4,13 @@ import { connect } from 'react-redux'
 import SectionItem from '../../components/sections/SectionItem'
 
 const SectionList = ({ isFetching, sections }) => {
-  console.log('sections', sections)
   return (
     !isFetching &&
     <div>
       {sections.map(section => (
         <SectionItem
           key={section._id}
-          section={section}
+          item={section}
         />
       ))}
     </div>

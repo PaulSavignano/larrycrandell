@@ -80,7 +80,6 @@ users.get('/', authenticate(['user','admin']), (req, res) => {
 // Update
 users.patch('/', authenticate(['user', 'admin']), (req, res) => {
   const { user } = req
-  console.log(req.body)
   const { type, itemId, values } = req.body
   switch (type) {
 
@@ -119,10 +118,8 @@ users.patch('/', authenticate(['user', 'admin']), (req, res) => {
       break
 
     case 'UPDATE_ADDRESS':
-      console.log('updating address')
       User.findOneAndUpdate({ _id: req.user._id, 'addresses._id': itemId }, { $set: { 'addresses.$.values': values }}, { new: true })
         .then(doc => {
-          console.log('doc ', doc.addresses)
           const { addresses } = doc
           res.send({ addresses })
         })
@@ -135,7 +132,6 @@ users.patch('/', authenticate(['user', 'admin']), (req, res) => {
     case 'DELETE_ADDRESS':
       User.findOneAndUpdate({ _id: req.user._id, 'addresses._id': itemId }, { $pull: { 'addresses': { _id: itemId } }}, { new: true })
         .then(doc => {
-          console.log(doc)
           const { values, addresses, roles } = doc
           res.send({ addresses })
         })
@@ -205,6 +201,7 @@ users.post('/recovery', (req, res, next) => {
     .then(token => {
       User.findOne({ 'values.email': email })
         .then(user => {
+          const path = process.env.ROOT_URL ? `${process.env.ROOT_URL}user/reset/${token}` : `localhost:${process.env.PORT}/user/reset/${token}`
           if (!user) return Promise.reject({ error: { email: 'User not found' }})
           const { firstName, email } = user.values
           user.passwordResetToken = token
@@ -216,7 +213,12 @@ users.post('/recovery', (req, res, next) => {
                 toSubject: 'Reset Password',
                 toBody: `
                   <p>Hi ${firstName},</p>
-                  <p>Click the link below to recover your password.<br />${process.env.ROOT_URL}reset/${token}</p>`
+                  <p>Click the link below to recover your password.</p>
+                  <br />
+                  <a href="${path}" style="color: black; text-decoration: none;">
+                    ${path}
+                  </a>
+                  `
               })
               res.send({ message: `A password recovery email has been sent to ${email}`})
             })

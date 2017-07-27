@@ -25,12 +25,10 @@ export const fetchAdd = (add) => {
     })
       .then(res => res.json())
       .then(json => {
-        console.log(json)
         if (json.error) return Promise.reject(json.error)
         dispatch(fetchAddSuccess(json))
       })
       .catch(err => {
-        console.log(err)
         dispatch(fetchAddFailure(err))
         throw new SubmissionError({ ...err, _error: 'Update failed!' })
     })
@@ -58,6 +56,7 @@ export const fetchBrand = () => {
         dispatch(fetchBrandSuccess(json[0]))
       })
       .catch(err => {
+        console.log(err)
         dispatch(fetchBrandFailure(err))
       })
   }
@@ -69,7 +68,7 @@ export const fetchBrand = () => {
 const fetchUpdateSuccess = (item) => ({ type: UPDATE, item })
 const fetchUpdateFailure = (error) => ({ type: ERROR, error })
 export const fetchUpdate = (path, update) => {
-  console.log(path, update)
+  console.log(update)
   return (dispatch, getState) => {
     return fetch(`/api/${route}/${path}`, {
       method: 'PATCH',
@@ -81,12 +80,10 @@ export const fetchUpdate = (path, update) => {
     })
       .then(res => res.json())
       .then(json => {
-        console.log(json)
         if (json.error) return Promise.reject(json.error)
         dispatch(fetchUpdateSuccess(json))
       })
       .catch(err => {
-        console.error(err)
         dispatch(fetchUpdateFailure(err))
         throw new SubmissionError({ ...err, _error: 'Update failed!' })
       })

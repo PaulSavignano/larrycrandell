@@ -7,6 +7,8 @@ import * as productActions from './products'
 export const type = 'SECTION'
 const route = 'sections'
 
+const START_EDIT = `START_EDIT_${type}`
+const STOP_EDIT = `STOP_EDIT_${type}`
 const ADD = `ADD_${type}`
 const REQUEST = `REQUEST_${type}S`
 const RECEIVE = `RECEIVE_${type}S`
@@ -66,7 +68,6 @@ export const fetchSections = () => {
         dispatch(fetchSectionsSuccess(json))
       })
       .catch(err => {
-        console.log(err)
         dispatch(fetchSectionsFailure(err))
       })
   }
@@ -144,3 +145,7 @@ export const fetchDelete = (_id) => {
       })
   }
 }
+
+
+export const startEdit = (_id) => ({ type: START_EDIT, _id })
+export const stopEdit = (_id) => ({ type: STOP_EDIT, _id })

@@ -15,6 +15,12 @@ class AdminOrderItem extends Component {
   state = {
     zDepth: 1,
   }
+  handleShipOrder = (e) =>  {
+    const { shipped, dispatch, handleSubmit, order: { _id } } = this.props
+    e.stopPropagation()
+    if (!shipped) return dispatch(fetchUpdate(_id, { type: 'SHIPPED' }))
+    return
+  }
   handleMouseEnter = () => this.setState({ zDepth: 4 })
   handleMouseLeave = () => this.setState({ zDepth: 1 })
   render() {
@@ -27,6 +33,7 @@ class AdminOrderItem extends Component {
         createdAt,
         address: { name },
         shipped,
+        shipDate,
         total
       }
     } = this.props
@@ -36,38 +43,45 @@ class AdminOrderItem extends Component {
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
         onTouchTap={() => dispatch(push(`/user/orders/${_id}`))}
-        className="cards"
+        className="card"
       >
-        <CardText style={{ display: 'flex', flexFlow: 'row wrap', justifyContent: 'space-between' }}>
-          <div>
+        <div style={{ display: 'flex', flexFlow: 'row wrap', justifyContent: 'space-between' }}>
+          <CardText style={{ flex: '2 2 auto' }}>
             <div>Order Placed</div>
             <div>{moment(createdAt).format("YYYY-MM-DD, h:mm a")}</div>
-          </div>
-          <div>
+          </CardText>
+          <CardText style={{ flex: '2 2 auto' }}>
             <div>Total</div>
             <div>{formatPrice(total)}</div>
-          </div>
-          <div>
+          </CardText>
+          <CardText style={{ flex: '2 2 auto' }}>
             <div>Ship To</div>
             <div>{name}</div>
-          </div>
-          <div>
+          </CardText>
+          {shipped &&
+            <CardText style={{ flex: '2 2 auto' }}>
+              <div>Ship Date</div>
+              <div>{moment(shipDate).format("YYYY-MM-DD, h:mm a")}</div>
+            </CardText>
+          }
+
+          <CardText style={{ flex: '2 2 auto' }}>
             <div>Order #</div>
             <div>{_id}</div>
-          </div>
-          <RaisedButton
-            label={shipped ? 'Shipped' : 'Ship'}
-            primary={shipped ? false : true}
-            onTouchTap={
-              !shipped &&
-              handleSubmit(() => {
-                const update = {
-                  type: 'SHIPPED',
-                }
-                return dispatch(fetchUpdate(_id, update))
-              })}
-          />
-        </CardText>
+          </CardText>
+          <CardText style={{ flex: '1 1 auto', display: 'flex' }}>
+            <form>
+              <RaisedButton
+                label={shipped ? 'Shipped' : 'Mark Ship'}
+                primary={shipped ? false : true}
+                onTouchTap={this.handleShipOrder}
+                style={{ flex: '1 1 auto'}}
+              />
+            </form>
+          </CardText>
+
+        </div>
+
         <OrderCartList items={items} />
       </Card>
     )

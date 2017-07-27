@@ -10,20 +10,21 @@ const CardSchema = new Schema({
   slug: { type: String },
   image: {
     src: { type: String },
-    width: { type: Number },
-    height: { type: Number }
+    width: { type: Number, trim: true, default: 1012 },
+    height: { type: Number, trim: true, default: 675 }
   },
   values: {
-    width: { type: Number },
-    maxWidth: { type: Number },
-    zDepth: { type: Number, default: 1 },
-    margin: { type: String, trim: true },
     backgroundColor: { type: String, trim: true },
+    flex: { type: String, trim: true, default: '1 1 auto' },
     iFrame: { type: String, trim: true },
-    text: { type: String, trim: true },
     link: { type: String, trim: true },
-  },
-  createdAt: { type: Date, default: Date.now }
+    margin: { type: String, trim: true },
+    text: { type: String, trim: true },
+    width: { type: Number },
+    zDepth: { type: Number, default: null }
+  }
+}, {
+  timestamps: true
 })
 
 CardSchema.pre('remove', function(next) {

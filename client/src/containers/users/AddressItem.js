@@ -22,7 +22,8 @@ class AddressItem extends Component {
         zDepth={this.state.zDepth}
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
-        className="cards"
+        className="card"
+        style={{ margin: 16 }}
       >
         <form
           onSubmit={handleSubmit((values) => {
@@ -37,7 +38,9 @@ class AddressItem extends Component {
             <SuccessableButton
               submitSucceeded={submitSucceeded}
               submitting={submitting}
-              label="ADDRESS"
+              label="update address"
+              successLabel="address updated!"
+              style={{ margin: 4 }}
             />
             <RaisedButton
               type="button"

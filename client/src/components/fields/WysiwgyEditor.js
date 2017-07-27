@@ -7,7 +7,6 @@ import { convertToRaw, EditorState, ContentState } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
 import '../../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 
-
 class WysiwgyEditor extends Component {
   static propTypes = {
     onBlur: PropTypes.func.isRequired,
@@ -51,9 +50,6 @@ class WysiwgyEditor extends Component {
       colors,
       fontFamily
     } = this.props
-    const editorStyle = {
-      border: '3px solid #F1F1F1',
-    }
     const fonts = [
       fontFamily,
       brandFontFamily,
@@ -70,7 +66,7 @@ class WysiwgyEditor extends Component {
           onEditorStateChange={this.onEditorStateChange}
           {...input}
           toolbarStyle={{ backgroundColor, color: '#000000', borderBottom: `1px solid ${borderColor}` }}
-          wrapperStyle={{ border: `2px solid ${borderColor}` }}
+          wrapperStyle={{ border: `2px solid ${borderColor}`, overflow: 'auto' }}
           toolbar={{
             fontFamily: {
               options: fonts.filter((value, index, self) =>  self.indexOf(value) === index).sort(),
@@ -89,7 +85,7 @@ class WysiwgyEditor extends Component {
 
 const mapStateToProps = ({
   brand: {
-    appBar: { styles: { brandFontFamily }},
+    appBar: { values: { brandFontFamily }},
     isFetching,
     theme: {
       fontFamily,

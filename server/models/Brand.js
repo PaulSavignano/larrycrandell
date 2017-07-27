@@ -6,10 +6,11 @@ const BrandSchema = new Schema({
   appBar: {
     image: {
       src: { type: String, minlength: 1, trim: true },
-      width: { type: Number },
-      height: { type: Number }
+      width: { type: Number, trim: true, default: 128 },
+      height: { type: Number, trim: true, default: 128 }
     },
-    styles: {
+    values: {
+      name: { type: String, minlength: 1, trim: true, default: 'Brand' },
       backgroundColor: { type: String, minlength: 1, trim: true, default: 'rgb(0, 188, 212)' },
       brandColor: { type: String, minlength: 1, trim: true, default: '#ffffff' },
       brandFontFamily: { type: String, minlength: 1, trim: true, default: 'Roboto, sans-serif' },
@@ -43,15 +44,15 @@ const BrandSchema = new Schema({
   footer: {
     image: {
       src: { type: String, minlength: 1, trim: true },
-      width: { type: Number },
-      height: { type: Number }
+      width: { type: Number, trim: true, default: 128 },
+      height: { type: Number, trim: true, default: 128 }
     },
     styles: {
-      backgroundColor: { type: String, minlength: 1, trim: true, default: 'rgb(0, 188, 212)' },
-      color: { type: String, minlength: 1, trim: true, default: '#ffffff' },
-      borderTop: { type: String, minlength: 1, trim: true },
-      borderBottom: { type: String, minlength: 1, trim: true },
-      imageAlign: { type: String },
+      backgroundColor: { type: String, trim: true, default: 'rgb(0, 188, 212)' },
+      color: { type: String, trim: true, default: '#ffffff' },
+      borderTop: { type: String, trim: true },
+      borderBottom: { type: String, trim: true },
+      margin: { type: String, trim: true },
     }
   },
   theme: {

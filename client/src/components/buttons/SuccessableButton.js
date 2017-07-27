@@ -1,41 +1,52 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { submit } from 'redux-form'
 import RaisedButton from 'material-ui/RaisedButton'
 import CircularProgress from 'material-ui/CircularProgress'
 
 class SuccessableButton extends Component {
   state = {
     submitting: false,
-    submitSucceeded: false
+    submitSucceeded: false,
+    timeoutId: null
   }
   componentWillReceiveProps(nextProps) {
     const { submitSucceeded, submitting } = nextProps
     if (submitting) this.setState({ submitting: true })
     if (submitSucceeded && this.state.submitting) {
-      this.setState({ submitting: false, submitSucceeded: true })
-      setTimeout(() => this.setState({ submitSucceeded: false }), 3000)
+      const timeoutId = setTimeout(() => this.setState({ submitSucceeded: false }), 3000)
+      this.setState({ submitting: false, submitSucceeded: true, timeoutId })
     }
   }
-  renderLabel = (submitting, submitSucceeded, label) => {
-    if (submitting) return <div key={1} style={{ marginTop: 2 }}><CircularProgress color="#ffffff" size={30} /></div>
-    if (submitSucceeded) return <div key={2} style={{ color: '#ffffff' }}>UPDATED {label}</div>
-    return <div key={3} style={{ color: '#ffffff' }}>UPDATE {label}</div>
+  componentWillUnmount() {
+    clearTimeout(this.state.timeoutId)
+  }
+  renderLabel = (submitting, submitSucceeded, label, successLabel) => {
+    if (submitting) return <CircularProgress color="#ffffff" size={25} style={{ verticalAlign: 'middle' }} />
+    if (submitSucceeded) return successLabel
+    return label
   }
   render() {
-    const { submitting, label, style } = this.props
-    const backgroundColor = style ? style.backgroundColor : null
-    const fontFamily = style ? style.fontFamily : 'inherit'
+    const { submitting, label, style, successLabel, dispatch } = this.props
+    const styles = style || {}
+    const backgroundColor = styles.backgroundColor || 'inherit'
+    const fontFamily = styles.fontFamily || 'inherit'
+    const margin = styles.margin || null
+    const color = styles.color || 'inherit'
     const { submitSucceeded } = this.state
+    const isPrimary = style ? { primary: false } : { primary: true }
     return (
       <RaisedButton
         type="submit"
-        children={this.renderLabel(submitting, submitSucceeded, label)}
-        primary={submitSucceeded ? false : true}
+        label={this.renderLabel(submitting, submitSucceeded, label, successLabel)}
+        labelColor={color}
         backgroundColor={submitSucceeded ? "#4CAF50" : backgroundColor }
-        style={{ flex: '1 1 auto', margin: 4 }}
+        style={{ flex: '1 1 auto', margin }}
         buttonStyle={{ fontFamily }}
+        {...isPrimary}
       />
     )
   }
 }
 
-export default SuccessableButton
+export default connect()(SuccessableButton)

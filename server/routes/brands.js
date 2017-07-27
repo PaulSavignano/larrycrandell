@@ -65,7 +65,7 @@ brands.patch('/appbar/:_id', authenticate(['admin']), (req, res) => {
                 width: image.width,
                 height: image.height
               },
-              styles: values
+              values
             }
           }
           Brand.findOneAndUpdate({ _id }, { $set: update }, { new: true })
@@ -88,7 +88,7 @@ brands.patch('/appbar/:_id', authenticate(['admin']), (req, res) => {
     case 'DELETE_IMAGE':
       deleteFile({ Key })
         .then(() => {
-          Brand.findOneAndUpdate({ _id }, { $set: { 'appBar.image': null }}, { new: true })
+          Brand.findOneAndUpdate({ _id }, { $set: { 'appBar.image.src': null }}, { new: true })
             .then(doc => res.send(doc))
             .catch(err => {
               console.error(err)
@@ -106,7 +106,7 @@ brands.patch('/appbar/:_id', authenticate(['admin']), (req, res) => {
       break
 
     case 'UPDATE_VALUES':
-      Brand.findOneAndUpdate({ _id }, { $set: { 'appBar.styles': values }}, { new: true })
+      Brand.findOneAndUpdate({ _id }, { $set: { 'appBar.values': values }}, { new: true })
         .then(doc => res.send(doc))
         .catch(err => {
           console.error(err)
@@ -206,7 +206,7 @@ brands.patch('/footer/:_id', authenticate(['admin']), (req, res) => {
               image: null
             }
           }
-          Brand.findOneAndUpdate({ _id }, { $set: update }, { new: true })
+          Brand.findOneAndUpdate({ _id }, { $set: { 'footer.image.src': null }}, { new: true })
             .then(doc => res.send(doc))
             .catch(err => {
               console.error(err)
@@ -226,7 +226,6 @@ brands.patch('/footer/:_id', authenticate(['admin']), (req, res) => {
     case 'UPDATE_VALUES':
       Brand.findOneAndUpdate({ _id }, { $set: { 'footer.styles': values }},  { new: true })
         .then(doc => {
-          console.log('inside footer update', doc)
           res.send(doc)
         })
         .catch(err => {
