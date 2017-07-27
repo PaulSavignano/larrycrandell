@@ -57,7 +57,7 @@ class AdminSectionItem extends Component {
       justifyContent,
       alignItems,
       margin,
-      height
+      minHeight
     } = item.values
     const slides = item.components.filter(value => value.type === 'Slide')
     const backgroundClass = image && { className: 'background-image' }
@@ -70,26 +70,12 @@ class AdminSectionItem extends Component {
     }
     return (
       !loading &&
-      <CSSTransitionGroup
-        transitionName="image"
-        transitionAppear={true}
-        transitionAppearTimeout={600}
-        transitionEnter={false}
-        transitionLeave={false}
-      >
-        {item.editing &&
-          <AdminSectionEdit
-            item={item}
-            page={page}
-          />
-        }
-        <div style={{ ...backgrounds, overflow: 'hidden' }} {...backgroundClass}>
+        <div style={{ ...backgrounds, backgroundColor, overflow: 'hidden' }} {...backgroundClass}>
           <div style={{ marginTop }}>
             <section style={{
               display: 'flex',
-              backgroundColor,
               flexFlow,
-              height,
+              minHeight,
               justifyContent,
               alignItems,
               margin
@@ -106,9 +92,13 @@ class AdminSectionItem extends Component {
               />
             </section>
           </div>
-
+          {item.editing &&
+            <AdminSectionEdit
+              item={item}
+              page={page}
+            />
+          }
         </div>
-      </CSSTransitionGroup>
     )
   }
 }

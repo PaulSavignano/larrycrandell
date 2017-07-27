@@ -52,7 +52,7 @@ class AdminCardItem extends Component {
         <Card
           zDepth={zDepth}
           onTouchTap={() => dispatch(startEdit(item._id))}
-          style={{ backgroundColor, cursor: 'pointer' }}
+          style={{ backgroundColor, cursor: 'pointer', minHeight: 30 }}
         >
           {image && <CardMedia><img src={image} alt="card" /></CardMedia>}
           {iFrame &&
