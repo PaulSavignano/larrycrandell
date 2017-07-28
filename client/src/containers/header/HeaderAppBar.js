@@ -49,10 +49,12 @@ const HeaderAppBar = ({
               {pages.filter(page => page.slug !== 'home').map(page => (
                 <FlatButton
                   key={page._id}
-                  style={{ color: path === `/${page.slug}` ? activeColor : color }}
+                  style={{ color }}
+                  labelStyle={path === `/${page.slug}` && { borderBottom: '2px solid', padding: '0 0 2px 0' }}
                   onTouchTap={() => dispatch(push(`/${page.slug}`))}
                   label={page.name}
                   hoverColor="none"
+
                 />
               ))}
             </span>

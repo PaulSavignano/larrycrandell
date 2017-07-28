@@ -64,7 +64,7 @@ class AdminCardItem extends Component {
               </iframe>
             </div>
           }
-          {text && text.length > 8 && <CardText>{renderHTML(text)}</CardText>}
+          {text && text.length > 8 && <CardText style={{ padding: 4 }}>{renderHTML(text)}</CardText>}
           {item.editing && <AdminCardEdit item={item} />}
         </Card>
       </CSSTransitionGroup>
