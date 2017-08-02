@@ -10,11 +10,11 @@ import { toggleCarousel } from '../../actions/slides'
 
 class AdminPageEdit extends Component {
   componentWillMount() {
+    window.scrollTo(0,0)
     if (this.props.slides.length) return this.props.dispatch(toggleCarousel())
   }
   render() {
     const { isFetching, page, slides, open, autoplay } = this.props
-    console.log(slides)
     return (
       <div style={{ minHeight: '80vh'}}>
         <AdminSectionList page={page} />
