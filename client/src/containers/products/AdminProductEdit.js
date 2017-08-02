@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { reduxForm, Field } from 'redux-form'
-import { CardHeader, CardMedia } from 'material-ui/Card'
+import { Card, CardHeader, CardMedia } from 'material-ui/Card'
 import RaisedButton from 'material-ui/RaisedButton'
 import Dialog from 'material-ui/Dialog'
 import CircularProgress from 'material-ui/CircularProgress'
@@ -22,18 +22,20 @@ const validate = values => {
 class AdminProductEdit extends Component {
   state = {
     zDepth: 1,
-    imageEdit: false
+    imageEdit: false,
+    imageDelete: false
   }
   componentWillReceiveProps({ dispatch, submitSucceeded, item }) {
     if (submitSucceeded || !item.editing) dispatch(stopEdit(item._id))
   }
   handleMouseEnter = () => this.setState({ zDepth: 4 })
   handleMouseLeave = () => this.setState({ zDepth: 1 })
-  handleImageEdit = (bool) => this.setState({ imageEdit: bool })
+  handleImageEdit = (bool) => {
+    this.setState({ imageEdit: bool })
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 10)
+  }
   handleImageDelete = (_id, update) => {
-    const { dispatch } = this.props
-    this.setState({ imageEdit: false })
-    return dispatch(fetchUpdate(_id, update))
+    this.setState({ imageEdit: false, imageDelete: true })
   }
   setEditorRef = (editor) => this.editor = editor
   render() {
@@ -47,8 +49,11 @@ class AdminProductEdit extends Component {
                 if (this.state.imageEdit) {
                   const image = this.editor.handleSave()
                   return dispatch(fetchUpdate(item._id, { type: 'UPDATE_IMAGE_AND_VALUES', image, values }))
+                } else if (this.state.imageDelete) {
+                  return dispatch(fetchUpdate(item._id, { type: 'DELETE_IMAGE_UPDATE_VALUES', values }))
+                } else {
+                  return dispatch(fetchUpdate(item._id, { type: 'UPDATE_VALUES', values }))
                 }
-                return dispatch(fetchUpdate(item._id, { type: 'UPDATE_VALUES', values }))
               })}
               label={submitting ? <CircularProgress key={1} color="#ffffff" size={25} style={{ verticalAlign: 'middle' }} /> : 'UPDATE PRODUCT'}
               primary={true}
@@ -56,10 +61,10 @@ class AdminProductEdit extends Component {
             />
             <RaisedButton
               type="button"
-              label="Remove Product"
+              label="X"
               className="delete-button"
               labelColor="#ffffff"
-              style={{ flex: '1 1 auto', margin: 4 }}
+              style={{ flex: '0 1 auto', margin: 4 }}
               onTouchTap={() => dispatch(fetchDelete(item._id, item.image))}
             />
             <RaisedButton
@@ -67,7 +72,7 @@ class AdminProductEdit extends Component {
               label="Cancel"
               className="delete-button"
               labelColor="#ffffff"
-              style={{ flex: '1 1 auto', margin: 4 }}
+              style={{ flex: '0 1 auto', margin: 4 }}
               onTouchTap={() => dispatch(stopEdit(item._id))}
             />
           </div>
@@ -79,58 +84,59 @@ class AdminProductEdit extends Component {
         contentStyle={{ width: '100%', maxWidth: 1000 }}
         bodyStyle={{ padding: 8 }}
       >
-
-        <CardHeader title={`Product ${item._id}`} titleStyle={{ fontSize: 16 }} />
-        <CardMedia>
-          <ImageForm
-            image={item.image}
-            type="image/jpg"
-            _id={item._id}
-            onImageEdit={this.handleImageEdit}
-            onImageDelete={this.handleImageDelete}
-            ref={this.setEditorRef}
-          />
-        </CardMedia>
-        <form>
-          <div className="field-container">
-            <Field
-              name="margin"
-              label="margin"
-              className="field"
-              component={renderTextField}
+        <Card>
+          <CardHeader title={`Product ${item._id}`} />
+          <CardMedia>
+            <ImageForm
+              image={item.image}
+              type="image/jpg"
+              _id={item._id}
+              onImageEdit={this.handleImageEdit}
+              onImageDelete={this.handleImageDelete}
+              ref={this.setEditorRef}
             />
-            <Field
-              name="name"
-              label="name"
-              className="field"
-              component={renderTextField}
-            />
-            <Field
-              name="price"
-              label="price"
-              type="number"
-              className="field"
-              component={renderTextField}
-            />
-            <Field
-              name="width"
-              label="width"
-              className="field"
-              component={renderTextField}
-            />
-          </div>
-          <div className="field-container">
-            <Field
-              name="description"
-              label="description"
-              multiLine={true}
-              rows={2}
-              className="field"
-              component={renderTextField}
-            />
-          </div>
-        </form>
-        {error && <div className="error">{error}</div>}
+          </CardMedia>
+          <form>
+            <div className="field-container">
+              <Field
+                name="margin"
+                label="margin"
+                className="field"
+                component={renderTextField}
+              />
+              <Field
+                name="name"
+                label="name"
+                className="field"
+                component={renderTextField}
+              />
+              <Field
+                name="price"
+                label="price"
+                type="number"
+                className="field"
+                component={renderTextField}
+              />
+              <Field
+                name="width"
+                label="width"
+                className="field"
+                component={renderTextField}
+              />
+            </div>
+            <div className="field-container">
+              <Field
+                name="description"
+                label="description"
+                multiLine={true}
+                rows={2}
+                className="field"
+                component={renderTextField}
+              />
+            </div>
+          </form>
+          {error && <div className="error">{error}</div>}
+        </Card>
       </Dialog>
     )
   }

@@ -27,10 +27,8 @@ class CardItem extends Component {
   handleMouseLeave = () => this.setState({ zDepth: 1 })
   render() {
     const { image, loading, zDepth } = this.state
-    const { dispatch, isFetching, item } = this.props
-    const values = item.values || {}
+    const { dispatch, isFetching, item, values } = this.props
     const {
-      backgroundColor,
       flex,
       iFrame,
       link,
@@ -39,7 +37,7 @@ class CardItem extends Component {
       width,
     } = values
     const cursor = link && 'pointer'
-    const cardStyle = { backgroundColor, cursor  }
+    const cardStyle = { cursor }
     const navigation = link && { onTouchTap: () => dispatch(push(link)) }
     return (
       !isFetching && !loading &&
@@ -59,27 +57,20 @@ class CardItem extends Component {
           style={cardStyle}
         >
           {image && <CardMedia><img src={image} alt="card"/></CardMedia>}
-          {iFrame &&
-            <div style={{ position: 'relative', paddingBottom: '50%', border: '20px solid white' }}>
-              <iframe
-                title="iFrame"
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                src={iFrame} frameBorder="0" allowFullScreen>
-              </iframe>
-            </div>
-          }
-          {text && text.length > 8 && <CardText style={{ padding: 4 }}>{renderHTML(text)}</CardText> }
+          {text && text.length > 8 && <CardText>{renderHTML(text)}</CardText> }
         </Card>
       </CSSTransitionGroup>
     )
   }
 }
 
-const mapStateToProps = ({ cards: { items, isFetching }}, { componentId }) => {
-  const item = items.find(item => item._id === componentId)
+const mapStateToProps = ({ cards: { items, isFetching } }, { componentId }) => {
+  const item = items.find(item => item._id === componentId) || {}
+  const values = item.values || {}
   return {
     item,
-    isFetching
+    isFetching,
+    values
   }
 }
 

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { reduxForm, Field } from 'redux-form'
+import { Card, CardHeader } from 'material-ui/Card'
 import RaisedButton from 'material-ui/RaisedButton'
 import Dialog from 'material-ui/Dialog'
 import CircularProgress from 'material-ui/CircularProgress'
@@ -13,18 +14,20 @@ import { fetchUpdate, fetchDelete, stopEdit } from '../../actions/cards'
 
 class AdminCardEdit extends Component {
   state = {
-    imageEdit: false
+    imageEdit: false,
+    imageDelete: false
   }
   componentWillReceiveProps({ dispatch, submitSucceeded, item }) {
     if (submitSucceeded && !item.editing) {
       dispatch(stopEdit(item._id))
     }
   }
-  handleImageEdit = (bool) => this.setState({ imageEdit: bool })
+  handleImageEdit = (bool) => {
+    this.setState({ imageEdit: bool })
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 10)
+  }
   handleImageDelete = (_id, update) => {
-    const { dispatch } = this.props
-    this.setState({ imageEdit: false })
-    return dispatch(fetchUpdate(_id, update))
+    this.setState({ imageEdit: false, imageDelete: true })
   }
   setEditorRef = (editor) => this.editor = editor
   render() {
@@ -38,8 +41,11 @@ class AdminCardEdit extends Component {
                 if (this.state.imageEdit) {
                   const image = this.editor.handleSave()
                   return dispatch(fetchUpdate(item._id, { type: 'UPDATE_IMAGE_AND_VALUES', image, values }))
+                } else if (this.state.imageDelete) {
+                  return dispatch(fetchUpdate(item._id, { type: 'DELETE_IMAGE_UPDATE_VALUES', values }))
+                } else {
+                  return dispatch(fetchUpdate(item._id, { type: 'UPDATE_VALUES', values }))
                 }
-                return dispatch(fetchUpdate(item._id, { type: 'UPDATE_VALUES', values }))
               })}
               label={submitting ? <CircularProgress key={1} color="#ffffff" size={25} style={{ verticalAlign: 'middle' }} /> : 'UPDATE CARD'}
               primary={true}
@@ -47,10 +53,10 @@ class AdminCardEdit extends Component {
             />
             <RaisedButton
               type="button"
-              label="Remove Card"
+              label="X"
               className="delete-button"
               labelColor="#ffffff"
-              style={{ flex: '1 1 auto', margin: 4 }}
+              style={{ flex: '0 1 auto', margin: 4 }}
               onTouchTap={() => dispatch(fetchDelete(item._id, item.image))}
             />
             <RaisedButton
@@ -58,7 +64,7 @@ class AdminCardEdit extends Component {
               label="Cancel"
               className="delete-button"
               labelColor="#ffffff"
-              style={{ flex: '1 1 auto', margin: 4 }}
+              style={{ flex: '0 1 auto', margin: 4 }}
               onTouchTap={() => dispatch(stopEdit(item._id))}
             />
           </div>
@@ -70,67 +76,59 @@ class AdminCardEdit extends Component {
         contentStyle={{ width: '100%', maxWidth: 1000 }}
         bodyStyle={{ padding: 8 }}
       >
-        <form>
-          <ImageForm
-            image={item.image}
-            type="image/jpg"
-            _id={item._id}
-            onImageEdit={this.handleImageEdit}
-            onImageDelete={this.handleImageDelete}
-            ref={this.setEditorRef}
-          />
-          <div>
-            <Field
-              name="text"
-              component={renderWysiwgyField}
+        <Card>
+          <CardHeader title={`Card ${item._id}`}/>
+          <form>
+            <ImageForm
+              image={item.image}
+              type="image/jpg"
+              _id={item._id}
+              onImageEdit={this.handleImageEdit}
+              onImageDelete={this.handleImageDelete}
+              ref={this.setEditorRef}
             />
-          </div>
-          <div className="field-container">
-            <Field
-              name="backgroundColor"
-              label="backgroundColor"
-              className="field"
-              component={renderTextField}
-            />
-            <Field
-              name="flex"
-              label="flex"
-              className="field"
-              component={renderTextField}
-            />
-            <Field
-              name="iFrame"
-              label="iFrame"
-              className="field"
-              component={renderTextField}
-            />
-            <Field
-              name="link"
-              label="link"
-              className="field"
-              component={renderTextField}
-            />
-            <Field
-              name="margin"
-              label="margin"
-              className="field"
-              component={renderTextField}
-            />
-            <Field
-              name="width"
-              label="width"
-              className="field"
-              component={renderTextField}
-            />
-            <Field
-              name="zDepth"
-              label="zDepth"
-              className="field"
-              component={renderTextField}
-            />
-          </div>
-        </form>
-        {error && <div className="error">{error}</div>}
+            <div>
+              <Field
+                name="text"
+                component={renderWysiwgyField}
+              />
+            </div>
+            <div className="field-container">
+              <Field
+                name="flex"
+                label="flex"
+                className="field"
+                component={renderTextField}
+              />
+              <Field
+                name="link"
+                label="link"
+                className="field"
+                component={renderTextField}
+              />
+              <Field
+                name="margin"
+                label="margin"
+                className="field"
+                component={renderTextField}
+              />
+              <Field
+                name="width"
+                label="width"
+                className="field"
+                component={renderTextField}
+              />
+              <Field
+                name="zDepth"
+                label="zDepth"
+                className="field"
+                component={renderTextField}
+              />
+            </div>
+          </form>
+          {error && <div className="error">{error}</div>}
+        </Card>
+
       </Dialog>
     )
   }

@@ -49,6 +49,14 @@ const sections = (state = {
           item
         )
       }
+    case `UPDATE_ORDER_${type}`:
+      return {
+        ...state,
+        items: state.items.map(item => item._id === action.item.sectionId ?
+          { ...item, components: item.components.map(comp => comp._id === action.item.componentId ? { ...comp, index: action.item.index } : comp) } :
+          item
+        )
+      }
     case `DELETE_${type}`:
       return {
         ...state,

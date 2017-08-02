@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { reduxForm, Field } from 'redux-form'
+import { Card, CardHeader } from 'material-ui/Card'
 import RaisedButton from 'material-ui/RaisedButton'
 import Dialog from 'material-ui/Dialog'
 import CircularProgress from 'material-ui/CircularProgress'
@@ -29,10 +30,10 @@ class AdminButtonEdit extends Component {
             />
             <RaisedButton
               type="button"
-              label="Remove Button"
+              label="X"
               className="delete-button"
               labelColor="#ffffff"
-              style={{ flex: '1 1 auto', margin: 4 }}
+              style={{ flex: '0 1 auto', margin: 4 }}
               onTouchTap={() => dispatch(fetchDelete(item._id, item.image))}
             />
             <RaisedButton
@@ -40,7 +41,7 @@ class AdminButtonEdit extends Component {
               label="Cancel"
               className="delete-button"
               labelColor="#ffffff"
-              style={{ flex: '1 1 auto', margin: 4 }}
+              style={{ flex: '0 1 auto', margin: 4 }}
               onTouchTap={() => dispatch(stopEdit(item._id))}
             />
           </div>
@@ -52,8 +53,9 @@ class AdminButtonEdit extends Component {
         contentStyle={{ width: '100%', maxWidth: 1000 }}
         bodyStyle={{ padding: 8 }}
       >
-        <form>
-          <div className="field-container">
+        <Card>
+          <CardHeader title={`Button ${item._id}`}/>
+          <form className="field-container">
             <Field
               name="backgroundColor"
               label="backgroundColor"
@@ -69,6 +71,18 @@ class AdminButtonEdit extends Component {
             <Field
               name="color"
               label="color"
+              className="field"
+              component={renderTextField}
+            />
+            <Field
+              name="flex"
+              label="flex"
+              className="field"
+              component={renderTextField}
+            />
+            <Field
+              name="font"
+              label="font (style weight size family)"
               className="field"
               component={renderTextField}
             />
@@ -91,22 +105,14 @@ class AdminButtonEdit extends Component {
               component={renderTextField}
             />
             <Field
-              name="maxWidth"
-              label="maxWidth"
-              type="number"
-              className="field"
-              component={renderTextField}
-            />
-            <Field
               name="width"
               label="width"
-              type="number"
               className="field"
               component={renderTextField}
             />
-          </div>
-        </form>
-        {error && <div className="error">{error}</div>}
+          </form>
+          {error && <div className="error">{error}</div>}
+        </Card>
       </Dialog>
     )
   }
@@ -118,11 +124,7 @@ AdminButtonEdit = compose(
     return {
       form: `card_${item._id}`,
       item,
-      initialValues: {
-        ...values,
-        width: values.width ? values.width.toString() : null,
-        maxWidth: values.maxWidth ? values.maxWidth.toString() : null,
-       }
+      initialValues: values
     }
   }),
   reduxForm({

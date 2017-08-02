@@ -7,21 +7,24 @@ import RaisedButton from 'material-ui/RaisedButton'
 import Dialog from 'material-ui/Dialog'
 import CircularProgress from 'material-ui/CircularProgress'
 
-import renderWysiwgyField from '../../components/fields/renderWysiwgyField'
+import renderTextField from '../../components/fields/renderTextField'
 import { fetchUpdate, fetchDelete, stopEdit } from '../../actions/slides'
 import ImageForm from '../../components/images/ImageForm'
 
-class AdminSlideItem extends Component {
+class AdminCarouselEdit extends Component {
   state = {
-    imageEdit: false
+    imageEdit: false,
+    imageDelete: false
   }
   componentWillReceiveProps({ dispatch, submitSucceeded, item }) {
     if (submitSucceeded && !item.editing) dispatch(stopEdit(item._id))
   }
-  handleImageEdit = (bool) => this.setState({ imageEdit: bool })
+  handleImageEdit = (bool) => {
+    this.setState({ imageEdit: bool })
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 10)
+  }
   handleImageDelete = (_id, update) => {
-    this.setState({ imageEdit: false })
-    return this.props.dispatch(fetchUpdate(_id, update))
+    this.setState({ imageEdit: false, imageDelete: true })
   }
   setEditorRef = (editor) => this.editor = editor
   render() {
@@ -35,8 +38,11 @@ class AdminSlideItem extends Component {
                 if (this.state.imageEdit) {
                   const image = this.editor.handleSave()
                   return dispatch(fetchUpdate(item._id, { type: 'UPDATE_IMAGE_AND_VALUES', image, values }))
+                } else if (this.state.imageDelete) {
+                  return dispatch(fetchUpdate(item._id, { type: 'DELETE_IMAGE_UPDATE_VALUES', values }))
+                } else {
+                  return dispatch(fetchUpdate(item._id, { type: 'UPDATE_VALUES', values }))
                 }
-                return dispatch(fetchUpdate(item._id, { type: 'UPDATE_VALUES', values }))
               })}
               label={submitting ? <CircularProgress key={1} color="#ffffff" size={25} style={{ verticalAlign: 'middle' }} /> : 'UPDATE SLIDE'}
               primary={true}
@@ -64,6 +70,7 @@ class AdminSlideItem extends Component {
         open={item.editing}
         onRequestClose={() => dispatch(stopEdit(item._id))}
         autoScrollBodyContent={true}
+        contentStyle={{ width: '100%', maxWidth: 1000 }}
         bodyStyle={{ padding: 8 }}
       >
         <CardHeader title={`Slide ${item._id}`} titleStyle={{ fontSize: 16 }} />
@@ -77,10 +84,36 @@ class AdminSlideItem extends Component {
               onImageDelete={this.handleImageDelete}
               ref={this.setEditorRef}
             />
-            <div>
+            <div className="field-container">
               <Field
-                name="text"
-                component={renderWysiwgyField}
+                name="color"
+                label="color"
+                className="field"
+                component={renderTextField}
+              />
+              <Field
+                name="mediaBackgroundColor"
+                label="mediaBackgroundColor"
+                className="field"
+                component={renderTextField}
+              />
+              <Field
+                name="contentBackgroundColor"
+                label="contentBackgroundColor"
+                className="field"
+                component={renderTextField}
+              />
+              <Field
+                name="title"
+                label="title"
+                className="field"
+                component={renderTextField}
+              />
+              <Field
+                name="subtitle"
+                label="subtitle"
+                className="field"
+                component={renderTextField}
               />
             </div>
           </form>
@@ -91,7 +124,7 @@ class AdminSlideItem extends Component {
   }
 }
 
-AdminSlideItem = compose(
+AdminCarouselEdit = compose(
   connect((state, { item }) => {
     const values = item.values || {}
     return {
@@ -100,6 +133,6 @@ AdminSlideItem = compose(
       initialValues: values
     }
   }),
-  reduxForm({destroyOnUnmount: false, asyncBlurFields: []}))(AdminSlideItem)
+  reduxForm({destroyOnUnmount: false, asyncBlurFields: []}))(AdminCarouselEdit)
 
-export default AdminSlideItem
+export default AdminCarouselEdit

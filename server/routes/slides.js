@@ -3,10 +3,9 @@ import { ObjectID } from 'mongodb'
 
 import authenticate from '../middleware/authenticate'
 import { uploadFile, deleteFile } from '../middleware/s3'
+import Page from '../models/Page'
 import Slide from '../models/Slide'
 import Section from '../models/Section'
-
-
 
 const slides = express.Router()
 
@@ -14,25 +13,23 @@ const s3Path = `${process.env.APP_NAME}/slides/slide_`
 
 // Create
 slides.post('/', authenticate(['admin']), (req, res) => {
-  const { pageId, sectionId, slug } = req.body
+  const { pageId, pageSlug } = req.body
   const newSlide = new Slide({
     pageId: ObjectID(pageId),
-    sectionId: ObjectID(sectionId),
-    slug,
+    pageSlug,
     image: null,
     values: []
   })
   newSlide.save()
     .then(slide => {
       const update = {
-        components: {
-          componentId: slide._id,
-          type: 'Slide'
+        slides: {
+          slideId: slide._id,
         }
       }
-      Section.findOneAndUpdate({ _id: sectionId }, { $push: update }, { new: true })
-        .then(section => {
-          res.send({ slide, section })
+      Page.findOneAndUpdate({ _id: pageId }, { $push: update }, { new: true })
+        .then(page => {
+          res.send({ slide, page })
         })
         .catch(err => {
           console.error(err)
@@ -44,7 +41,6 @@ slides.post('/', authenticate(['admin']), (req, res) => {
       res.status(400).send()
     })
 })
-
 
 
 // Read
@@ -105,6 +101,27 @@ slides.patch('/:_id', authenticate(['admin']), (req, res) => {
         })
       break
 
+
+    case 'DELETE_IMAGE_UPDATE_VALUES':
+      deleteFile({ Key })
+        .then(() => {
+          Slide.findOneAndUpdate({ _id }, { $set: { 'image.src': null, values } }, { new: true })
+            .then(doc => res.send(doc))
+            .catch(err => {
+              console.error(err)
+              res.status(400).send()
+            })
+          .catch(err => {
+            console.error(err)
+            res.status(400).send()
+          })
+        })
+        .catch(err => {
+          console.error(err)
+          res.status(400).send()
+        })
+      break
+
     case 'DELETE_IMAGE':
       deleteFile({ Key })
         .then(() => {
@@ -151,8 +168,8 @@ slides.delete('/:_id', authenticate(['admin']), (req, res) => {
     .then(slide => {
       slide.remove()
         .then(slide => {
-          Section.findOneAndUpdate({ _id: slide.sectionId }, { $pull: { components: { componentId: slide._id }}}, { new: true })
-            .then(section => res.send({ slide, section }))
+          Page.findOneAndUpdate({ _id: slide.pageId }, { $pull: { slides: { slideId: slide._id }}}, { new: true })
+            .then(page => res.send({ slide, page }))
             .catch(err => {
               console.error(err)
               res.status(400).send()

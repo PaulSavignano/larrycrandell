@@ -63,7 +63,7 @@ class Footer extends Component {
             </div>
             <div style={{ paddingBottom: 16 }}>
               <Link to="/" style={{}}>{name ? name : 'Brand'} {new Date().getFullYear()}</Link>
-              { phone && <div><a href={`tel:${phone.replace(/\D+/g, '')}`}>{phone}</a></div> }
+              { phone && <div><a href={`tel:${phone.replace(/\D+/g, '')}`} style={{ textDecoration: 'none', color: 'inherit' }}>{phone}</a></div> }
               { email && <div>{email}</div> }
               { street && <div>{street}</div> }
               { city && <div>{city}, {state}. {zip}</div> }

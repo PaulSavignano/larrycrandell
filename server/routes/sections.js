@@ -5,6 +5,7 @@ import authenticate from '../middleware/authenticate'
 import { uploadFile, deleteFile, deleteFiles } from '../middleware/s3'
 import Section from '../models/Section'
 import Card from '../models/Card'
+import Page from '../models/Page'
 import Product from '../models/Product'
 import Slide from '../models/Slide'
 
@@ -14,13 +15,27 @@ const s3Path = `${process.env.APP_NAME}/sections/section_`
 
 // Create
 sections.post('/', authenticate(['admin']), (req, res) => {
-  const { pageId, slug } = req.body
-  const section = new Section({
+  const { pageId, pageSlug } = req.body
+  const newSection = new Section({
     pageId: ObjectID(pageId),
-    slug
+    pageSlug
   })
-  section.save()
-    .then(doc => res.send(doc))
+  newSection.save()
+    .then(section => {
+      const update = {
+        sections: {
+          sectionId: section._id,
+        }
+      }
+      Page.findOneAndUpdate({ _id: pageId }, { $push: update }, { new: true })
+        .then(page => {
+          res.send({ section, page })
+        })
+        .catch(err => {
+          console.error(err)
+          res.status(400).send()
+        })
+    })
     .catch(err => {
       console.error(err)
       res.status(400).send()
@@ -101,6 +116,26 @@ sections.patch('/:_id', authenticate(['admin']), (req, res) => {
         })
       break
 
+    case 'DELETE_IMAGE_UPDATE_VALUES':
+      deleteFile({ Key })
+        .then(() => {
+          Section.findOneAndUpdate({ _id }, { $set: { 'image.src': null, values } }, { new: true })
+            .then(doc => res.send(doc))
+            .catch(err => {
+              console.error(err)
+              res.status(400).send()
+            })
+          .catch(err => {
+            console.error(err)
+            res.status(400).send()
+          })
+        })
+        .catch(err => {
+          console.error(err)
+          res.status(400).send()
+        })
+      break
+
     case 'UPDATE_VALUES':
       Section.findOneAndUpdate({ _id }, { $set: { values }}, { new: true })
         .then(doc => {
@@ -160,7 +195,12 @@ sections.delete('/:_id', authenticate(['admin']), (req, res) => {
     .then(section => {
       section.remove()
         .then(section => {
-          res.send(section)
+          Page.findOneAndUpdate({ _id: section.pageId }, { $pull: { sections: { sectionId: section._id }}}, { new: true })
+            .then(page => res.send({ section, page }))
+            .catch(err => {
+              console.error(err)
+              res.status(400).send()
+            })
         })
         .catch(err => {
           console.error(err)

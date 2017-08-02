@@ -14,13 +14,13 @@ const s3Path = `${process.env.APP_NAME}/products`
 // Create
 products.post('/', (req, res) => {
   const { pageId, sectionId } = req.body
-  const product = new Product({
+  const newProduct = new Product({
     pageId: ObjectID(pageId),
     sectionId: ObjectID(sectionId),
     image: null,
     values: []
   })
-  product.save()
+  newProduct.save()
     .then(product => {
       const update = {
         components: {
@@ -101,6 +101,26 @@ products.patch('/:_id', (req, res) => {
             console.error(err)
             res.status(400).send()
           })
+        })
+      break
+
+    case 'DELETE_IMAGE_UPDATE_VALUES':
+      deleteFile({ Key })
+        .then(() => {
+          Product.findOneAndUpdate({ _id }, { $set: { 'image.src': null, values } }, { new: true })
+            .then(doc => res.send(doc))
+            .catch(err => {
+              console.error(err)
+              res.status(400).send()
+            })
+          .catch(err => {
+            console.error(err)
+            res.status(400).send()
+          })
+        })
+        .catch(err => {
+          console.error(err)
+          res.status(400).send()
         })
       break
 

@@ -9,12 +9,16 @@ import buttons from '../reducers/buttons'
 import cards from '../reducers/cards'
 import carts from '../reducers/carts'
 import drawer from '../reducers/drawer'
+import iframes from '../reducers/iframes'
+import images from '../reducers/images'
 import orders from '../reducers/orders'
 import pages from '../reducers/pages'
 import products from '../reducers/products'
 import search from '../reducers/search'
 import sections from '../reducers/sections'
 import slides from '../reducers/slides'
+import texts from '../reducers/texts'
+import titles from '../reducers/titles'
 import user from '../reducers/users'
 
 const rootReducer = combineReducers({
@@ -24,6 +28,8 @@ const rootReducer = combineReducers({
   carts,
   drawer,
   form: formReducer,
+  iframes,
+  images,
   orders,
   pages,
   products,
@@ -31,6 +37,8 @@ const rootReducer = combineReducers({
   search,
   sections,
   slides,
+  texts,
+  titles,
   user,
 })
 

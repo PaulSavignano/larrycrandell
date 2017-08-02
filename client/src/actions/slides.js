@@ -1,12 +1,13 @@
 import { SubmissionError } from 'redux-form'
 
-import * as sectionActions from './sections'
+import * as pageActions from './pages'
 
 export const type = 'SLIDES'
 const route = 'slides'
 
 const START_EDIT = `START_EDIT_${type}`
 const STOP_EDIT = `STOP_EDIT_${type}`
+const TOGGLE = `TOGGLE_${type}`
 const ADD = `ADD_${type}`
 const REQUEST = `REQUEST_${type}S`
 const RECEIVE = `RECEIVE_${type}S`
@@ -31,9 +32,9 @@ export const fetchAdd = (add) => {
       .then(res => res.json())
       .then(json => {
         if (json.error) return Promise.reject(json.error)
-        const { slide, section } = json
+        const { slide, page } = json
         dispatch(fetchAddSuccess(slide))
-        dispatch(sectionActions.fetchUpdateSuccess(section))
+        dispatch(pageActions.fetchUpdateSuccess(page))
       })
       .catch(err => {
         dispatch(fetchAddFailure(err))
@@ -119,8 +120,8 @@ export const fetchDelete = (_id) => {
     })
     .then(json => {
       if (json.error) return Promise.reject(json.error)
-      const { slide, section } = json
-      dispatch(sectionActions.fetchUpdateSuccess(section))
+      const { slide, page } = json
+      dispatch(pageActions.fetchUpdateSuccess(page))
       dispatch(fetchDeleteSuccess(slide._id))
     })
     .catch(err => {
@@ -131,6 +132,8 @@ export const fetchDelete = (_id) => {
 }
 
 export const deletes = (items) => ({ type: DELETES, items })
+
+export const toggleCarousel = () => ({ type: TOGGLE })
 
 export const startEdit = (_id) => ({ type: START_EDIT, _id })
 export const stopEdit = (_id) => ({ type: STOP_EDIT, _id })
