@@ -60,7 +60,7 @@ export const fetchSlides = () => {
     })
     .then(json => {
       if (json.error) return Promise.reject(json.error)
-      if (window.location.pathname === '/') {
+      if (json.length && window.location.pathname === '/') {
         dispatch(toggleCarousel(true))
         dispatch(fetchSlidesSuccess(json))
       } else {
