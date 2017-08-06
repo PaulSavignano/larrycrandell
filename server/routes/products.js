@@ -1,5 +1,6 @@
 import express from 'express'
 import { ObjectID } from 'mongodb'
+import moment from 'moment'
 
 import authenticate from '../middleware/authenticate'
 import { uploadFile, deleteFile } from '../middleware/s3'
@@ -13,12 +14,11 @@ const s3Path = `${process.env.APP_NAME}/products`
 
 // Create
 products.post('/', (req, res) => {
-  const { pageId, sectionId, pageSlug, productSlug } = req.body
+  const { pageId, sectionId, pageSlug } = req.body
   const newProduct = new Product({
     pageId: ObjectID(pageId),
     sectionId: ObjectID(sectionId),
     pageSlug,
-    productSlug,
     image: null,
     values: []
   })
@@ -74,13 +74,13 @@ products.get('/:_id', (req, res) => {
 products.patch('/:_id', (req, res) => {
   const _id = req.params._id
   if (!ObjectID.isValid(_id)) return res.status(404).send()
-  const { type, image, values } = req.body
-  const Key = `${s3Path}/${_id}`
-  const productSlug = values ? `products/${slugIt(values.name)}/${_id}` : null
+  const { type, image, oldImage, values } = req.body
+  const Key = `${s3Path}/${_id}_${moment(Date.now()).format("YYYY-MM-DD_h-mm-ss-a")}`
+  const productSlug = values ? `${slugIt(values.name)}/${_id}` : null
   switch (type) {
 
     case 'UPDATE_IMAGE_AND_VALUES':
-      uploadFile({ Key }, image.src)
+      uploadFile({ Key }, image.src, oldImage)
         .then(data => {
           const update = {
             image: {
@@ -106,28 +106,8 @@ products.patch('/:_id', (req, res) => {
         })
       break
 
-    case 'DELETE_IMAGE_UPDATE_VALUES':
-      deleteFile({ Key })
-        .then(() => {
-          Product.findOneAndUpdate({ _id }, { $set: { 'image.src': null, values } }, { new: true })
-            .then(doc => res.send(doc))
-            .catch(err => {
-              console.error(err)
-              res.status(400).send()
-            })
-          .catch(err => {
-            console.error(err)
-            res.status(400).send()
-          })
-        })
-        .catch(err => {
-          console.error(err)
-          res.status(400).send()
-        })
-      break
-
     case 'DELETE_IMAGE':
-      deleteFile({ Key })
+      deleteFile({ Key: image.src })
         .then(() => {
           Product.findOneAndUpdate({ _id }, { $set: { 'image.src': null }}, { new: true })
             .then(doc => {

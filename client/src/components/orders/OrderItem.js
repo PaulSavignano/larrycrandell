@@ -24,7 +24,6 @@ class OrderItem extends Component {
         total
       }
     } = this.props
-    console.log(items)
     return (
       <Card
         zDepth={this.state.zDepth}

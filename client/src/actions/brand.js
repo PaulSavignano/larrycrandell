@@ -68,7 +68,6 @@ export const fetchBrand = () => {
 const fetchUpdateSuccess = (item) => ({ type: UPDATE, item })
 const fetchUpdateFailure = (error) => ({ type: ERROR, error })
 export const fetchUpdate = (path, update) => {
-  console.log(update)
   return (dispatch, getState) => {
     return fetch(`/api/${route}/${path}`, {
       method: 'PATCH',
@@ -84,6 +83,7 @@ export const fetchUpdate = (path, update) => {
         dispatch(fetchUpdateSuccess(json))
       })
       .catch(err => {
+        console.log(err)
         dispatch(fetchUpdateFailure(err))
         throw new SubmissionError({ ...err, _error: 'Update failed!' })
       })

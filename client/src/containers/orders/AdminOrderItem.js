@@ -16,7 +16,7 @@ class AdminOrderItem extends Component {
     zDepth: 1,
   }
   handleShipOrder = (e) =>  {
-    const { shipped, dispatch, handleSubmit, order: { _id } } = this.props
+    const { shipped, dispatch, order: { _id }} = this.props
     e.stopPropagation()
     if (!shipped) return dispatch(fetchUpdate(_id, { type: 'SHIPPED' }))
     return
@@ -26,7 +26,6 @@ class AdminOrderItem extends Component {
   render() {
     const {
       dispatch,
-      handleSubmit,
       order: {
         _id,
         cart: { items },
@@ -64,12 +63,11 @@ class AdminOrderItem extends Component {
               <div>{moment(shipDate).format("YYYY-MM-DD, h:mm a")}</div>
             </CardText>
           }
-
           <CardText style={{ flex: '2 2 auto' }}>
             <div>Order #</div>
             <div>{_id}</div>
           </CardText>
-          <CardText style={{ flex: '1 1 auto', display: 'flex' }}>
+          <CardText style={{ flex: '0 1 auto', display: 'flex' }}>
             <form>
               <RaisedButton
                 label={shipped ? 'Shipped' : 'Mark Ship'}
@@ -79,9 +77,7 @@ class AdminOrderItem extends Component {
               />
             </form>
           </CardText>
-
         </div>
-
         <OrderCartList items={items} />
       </Card>
     )
@@ -89,7 +85,7 @@ class AdminOrderItem extends Component {
 }
 
 
-export default compose(connect((state, { order }) => ({
-  form: `order_${order._id}`
+export default compose(connect((state, { order: { _id }}) => ({
+  form: `order_${_id}`
 })),
 reduxForm({destroyOnUnmount: false, asyncBlurFields: []}))(AdminOrderItem)

@@ -1,5 +1,6 @@
 import express from 'express'
 import { ObjectID } from 'mongodb'
+import moment from 'moment'
 
 import authenticate from '../middleware/authenticate'
 import { uploadFile, deleteFile } from '../middleware/s3'
@@ -13,29 +14,12 @@ const s3Path = `${process.env.APP_NAME}/slides/slide_`
 
 // Create
 slides.post('/', authenticate(['admin']), (req, res) => {
-  const { pageId, pageSlug } = req.body
   const newSlide = new Slide({
-    pageId: ObjectID(pageId),
-    pageSlug,
     image: null,
     values: []
   })
   newSlide.save()
-    .then(slide => {
-      const update = {
-        slides: {
-          slideId: slide._id,
-        }
-      }
-      Page.findOneAndUpdate({ _id: pageId }, { $push: update }, { new: true })
-        .then(page => {
-          res.send({ slide, page })
-        })
-        .catch(err => {
-          console.error(err)
-          res.status(400).send()
-        })
-    })
+    .then(slide => res.send(slide))
     .catch(err => {
       console.error(err)
       res.status(400).send()
@@ -71,12 +55,12 @@ slides.get('/:_id', (req, res) => {
 slides.patch('/:_id', authenticate(['admin']), (req, res) => {
   const _id = req.params._id
   if (!ObjectID.isValid(_id)) return res.status(404).send()
-  const { type, sectionId, image, values } = req.body
-  const Key = `${s3Path}${_id}`
+  const { type, sectionId, image, oldImage, values } = req.body
+  const Key = `${s3Path}${_id}_${moment(Date.now()).format("YYYY-MM-DD_h-mm-ss-a")}`
   switch (type) {
 
     case 'UPDATE_IMAGE_AND_VALUES':
-      uploadFile({ Key }, image.src)
+      uploadFile({ Key }, image.src, oldImage)
         .then(data => {
           const update = {
             image: {
@@ -101,29 +85,8 @@ slides.patch('/:_id', authenticate(['admin']), (req, res) => {
         })
       break
 
-
-    case 'DELETE_IMAGE_UPDATE_VALUES':
-      deleteFile({ Key })
-        .then(() => {
-          Slide.findOneAndUpdate({ _id }, { $set: { 'image.src': null, values } }, { new: true })
-            .then(doc => res.send(doc))
-            .catch(err => {
-              console.error(err)
-              res.status(400).send()
-            })
-          .catch(err => {
-            console.error(err)
-            res.status(400).send()
-          })
-        })
-        .catch(err => {
-          console.error(err)
-          res.status(400).send()
-        })
-      break
-
     case 'DELETE_IMAGE':
-      deleteFile({ Key })
+      deleteFile({ Key: image.src })
         .then(() => {
           const update = { image: null }
           Slide.findOneAndUpdate({ _id }, { $set: { 'image.src': null }}, { new: true })
@@ -165,21 +128,7 @@ slides.delete('/:_id', authenticate(['admin']), (req, res) => {
   if (!ObjectID.isValid(_id)) return res.status(404).send()
   const Key = `${s3Path}${_id}`
   Slide.findOne({ _id })
-    .then(slide => {
-      slide.remove()
-        .then(slide => {
-          Page.findOneAndUpdate({ _id: slide.pageId }, { $pull: { slides: { slideId: slide._id }}}, { new: true })
-            .then(page => res.send({ slide, page }))
-            .catch(err => {
-              console.error(err)
-              res.status(400).send()
-            })
-        })
-        .catch(err => {
-          console.error(err)
-          res.status(400).send()
-        })
-    })
+    .then(slide => res.send(slide))
     .catch(err => {
       console.error(err)
       res.status(400).send()

@@ -1,25 +1,26 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup'
-import renderHTML from 'react-render-html'
+import React from 'react'
 import RaisedButton from 'material-ui/RaisedButton'
 
+import buttonContainer from './buttonContainer'
 import AdminButtonEdit from './AdminButtonEdit'
 import { startEdit } from '../../actions/buttons'
 
-const AdminButtonItem = ({ dispatch, item, isFetching, values }) => {
+const AdminButtonItem = ({ dispatch, item }) => {
   const {
-    backgroundColor,
-    border,
-    color,
-    flex,
-    font,
-    label,
-    link,
-    margin,
-    width,
-  } = values
-  const editComp = item.editing && { children: <AdminButtonEdit key={1} item={item} /> }
+    _id,
+    editing,
+    values: {
+      backgroundColor,
+      border,
+      color,
+      flex,
+      font,
+      label,
+      margin,
+      width
+    }
+  } = item
+  const editComp = editing && { children: <AdminButtonEdit key={1} item={item} /> }
   const attributes = {
     backgroundColor,
     label,
@@ -27,23 +28,12 @@ const AdminButtonItem = ({ dispatch, item, isFetching, values }) => {
     labelStyle: { font },
     style: { backgroundColor, border, flex, margin, width },
     type: 'button',
-    onTouchTap: () => dispatch(startEdit(item._id)),
+    onTouchTap: () => dispatch(startEdit(_id)),
     ...editComp
   }
   return (
-    !isFetching &&
     <RaisedButton {...attributes} />
   )
 }
 
-const mapStateToProps = ({ buttons: { items, isFetching } }, { componentId }) => {
-  const item = items.find(item => item._id === componentId) || {}
-  const values = item.values || {}
-  return {
-    item,
-    isFetching,
-    values
-  }
-}
-
-export default connect(mapStateToProps)(AdminButtonItem)
+export default buttonContainer(AdminButtonItem)

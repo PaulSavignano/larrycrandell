@@ -16,6 +16,7 @@ const CardSchema = new Schema({
   values: {
     flex: { type: String, trim: true, default: '1 1 auto' },
     iframe: { type: String, trim: true },
+    iframeBorder: { type: String, trim: true },
     link: { type: String, trim: true },
     margin: { type: String, trim: true },
     text: { type: String, trim: true },
@@ -28,9 +29,8 @@ const CardSchema = new Schema({
 
 CardSchema.pre('remove', function(next) {
   const card = this
-  if (card.image) {
-    const Key = `${s3Path}${card._id}`
-    deleteFile({ Key }).catch(err => console.error(err))
+  if (card.image && card.image.src) {
+    deleteFile({ Key: card.image.src }).catch(err => console.error(err))
   }
   next()
 })

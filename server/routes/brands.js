@@ -4,6 +4,7 @@ import url from 'url'
 import Brand from '../models/Brand'
 import authenticate from '../middleware/authenticate'
 import { uploadFile, deleteFile } from '../middleware/s3'
+import moment from 'moment'
 
 const brands = express.Router()
 
@@ -52,11 +53,11 @@ brands.get('/:_id', (req, res) => {
 brands.patch('/appbar/:_id', authenticate(['admin']), (req, res) => {
   const _id = req.params._id
   if (!ObjectID.isValid(_id)) return res.status(404).send()
-  const { type, image, values } = req.body
-  const Key = `${s3Path}${_id}/appBar`
+  const { type, image, oldImage, values } = req.body
+  const Key = `${s3Path}${_id}/appBar_${moment(Date.now()).format("YYYY-MM-DD_h-mm-ss-a")}`
   switch (type) {
     case 'UPDATE_IMAGE_AND_VALUES':
-      uploadFile({ Key }, image.src)
+      uploadFile({ Key }, image.src, oldImage)
         .then(data => {
           const update = {
             appBar: {
@@ -86,7 +87,7 @@ brands.patch('/appbar/:_id', authenticate(['admin']), (req, res) => {
       break
 
     case 'DELETE_IMAGE':
-      deleteFile({ Key })
+      deleteFile({ Key: image.src })
         .then(() => {
           Brand.findOneAndUpdate({ _id }, { $set: { 'appBar.image.src': null }}, { new: true })
             .then(doc => res.send(doc))
@@ -165,11 +166,11 @@ brands.patch('/main/:_id', authenticate(['admin']), (req, res) => {
 brands.patch('/footer/:_id', authenticate(['admin']), (req, res) => {
   const _id = req.params._id
   if (!ObjectID.isValid(_id)) return res.status(404).send()
-  const { type, image, values } = req.body
-  const Key = `${s3Path}${_id}/footer`
+  const { type, image, oldImage, values } = req.body
+  const Key = `${s3Path}${_id}/footer_${moment(Date.now()).format("YYYY-MM-DD_h-mm-ss-a")}`
   switch (type) {
     case 'UPDATE_IMAGE_AND_VALUES':
-      uploadFile({ Key }, image.src)
+      uploadFile({ Key }, image.src, oldImage)
         .then(data => {
           const update = {
             footer: {
@@ -199,7 +200,7 @@ brands.patch('/footer/:_id', authenticate(['admin']), (req, res) => {
       break
 
     case 'DELETE_IMAGE':
-      deleteFile({ Key })
+      deleteFile({ Key: image.src })
         .then(() => {
           const update = {
             footer: {

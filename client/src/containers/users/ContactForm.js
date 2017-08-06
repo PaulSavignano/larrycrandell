@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Dialog from 'material-ui/Dialog'
-import RaisedButton from 'material-ui/RaisedButton'
 import FlatButton from 'material-ui/FlatButton'
 import { Card, CardTitle, CardText } from 'material-ui/Card'
 import { Field, reduxForm } from 'redux-form'
@@ -75,7 +74,6 @@ class ContactForm extends Component {
               submitting={submitting}
               label="submit"
               successLabel="submitted!"
-              style={{ margin: 4}}
             />
           </div>
         </form>

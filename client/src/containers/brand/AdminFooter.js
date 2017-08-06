@@ -8,6 +8,14 @@ import renderTextField from '../../components/fields/renderTextField'
 import ImageForm from '../../components/images/ImageForm'
 import { fetchUpdate } from '../../actions/brand'
 
+const fields = [
+  'backgroundColor',
+  'color',
+  'borderTop',
+  'borderBottom',
+  'margin'
+]
+
 class AdminFooter extends Component {
   state = {
     zDepth: 1,
@@ -20,9 +28,8 @@ class AdminFooter extends Component {
   handleMouseLeave = () => this.setState({ zDepth: 1 })
   handleImageEdit = (bool) => this.setState({ imageEdit: bool, submitted: false })
   handleImageDelete = (_id, update) => {
-    const { dispatch } = this.props
     this.setState({ imageEdit: false })
-    return dispatch(fetchUpdate(`footer/${_id}`, update))
+    return this.props.dispatch(fetchUpdate(`footer/${_id}`, update))
   }
   setEditorRef = (editor) => this.editor = editor
   render() {
@@ -35,12 +42,9 @@ class AdminFooter extends Component {
       handleSubmit,
       image,
       isFetching,
-      primary1Color,
       submitSucceeded,
-      submitting,
-      textColor
+      submitting
     } = this.props
-    console.log(image)
     return (
       !isFetching &&
       <Card
@@ -58,63 +62,38 @@ class AdminFooter extends Component {
             _id={_id}
             onImageEdit={this.handleImageEdit}
             onImageDelete={this.handleImageDelete}
-            style={{ fontFamily, backgroundColor: primary1Color, color: canvasColor }}
             ref={this.setEditorRef}
+            fontFamily={fontFamily}
           />
         </CardMedia>
         <form onSubmit={handleSubmit((values) => {
           const path = `footer/${_id}`
           if (this.state.imageEdit) {
             const img = this.editor.handleSave()
-            return dispatch(fetchUpdate(path, { type: 'UPDATE_IMAGE_AND_VALUES', image: img, values }))
+            const oldImage = image.src
+            return dispatch(fetchUpdate(path, { type: 'UPDATE_IMAGE_AND_VALUES', image: img, oldImage, values }))
           }
           return dispatch(fetchUpdate(path, { type: 'UPDATE_VALUES', values }))
         })}
           style={{ flex: '1 1 auto' }}
         >
           <div className="field-container">
-            <Field
-              name="backgroundColor"
-              label="backgroundColor"
-              component={renderTextField}
-              className="field"
-              style={{ fontFamily }}
-            />
-            <Field
-              name="color"
-              label="color"
-              component={renderTextField}
-              className="field"
-              style={{ fontFamily }}
-            />
-            <Field
-              name="borderTop"
-              label="borderTop"
-              component={renderTextField}
-              className="field"
-              style={{ fontFamily }}
-            />
-            <Field
-              name="borderBottom"
-              label="borderBottom"
-              component={renderTextField}
-              className="field"
-              style={{ fontFamily }}
-            />
-            <Field
-              name="margin"
-              label="margin"
-              className="field"
-              component={renderTextField}
-              style={{ fontFamily }}
-            />
+            {fields.map(field => (
+              <Field
+                key={field}
+                name={field}
+                label={field}
+                component={renderTextField}
+                className="field"
+                style={{ fontFamily }}
+              />
+            ))}
           </div>
           {error && <div className="error">{error}</div>}
           <div className="button-container">
             <SuccessableButton
               submitSucceeded={submitSucceeded}
               submitting={submitting}
-              style={{ fontFamily, backgroundColor: primary1Color, color: canvasColor, margin: 4 }}
               label="update footer"
               successLabel="footer updated!"
             />
