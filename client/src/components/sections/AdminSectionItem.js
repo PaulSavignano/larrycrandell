@@ -14,14 +14,14 @@ import AdminTextItem from '../../containers/texts/AdminTextItem'
 import AdminTitleItem from '../../containers/titles/AdminTitleItem'
 import { startEdit } from '../../actions/sections'
 
-const renderComponents = (components) => {
+const renderComponents = (components, item) => {
   const componentList = (component) => {
     const { type, componentId } = component
     switch(type) {
       case 'Button':
         return <AdminButtonItem key={component._id} componentId={componentId}  />
       case 'Contact':
-        return <AdminContactForm key={component._id} componentId={componentId} sectionId={this.props.item._id}  />
+        return <AdminContactForm key={component._id} componentId={componentId} sectionId={item._id}  />
       case 'Card':
         return <AdminCardItem key={component._id} componentId={componentId}  />
       case 'Iframe':
@@ -70,31 +70,33 @@ const AdminSectionItem = ({ dispatch, item, page }) => {
       }}
       {...backgroundImageClass}
     >
-      <section style={{
-        display: 'flex',
-        flexFlow,
-        minHeight,
-        justifyContent,
-        alignItems,
-        margin,
-        padding
-      }}>
-        {renderComponents(components)}
+      <section>
+        <div style={{
+          display: 'flex',
+          flexFlow,
+          minHeight,
+          justifyContent,
+          alignItems,
+          margin,
+          padding
+        }}>
+          {renderComponents(components, item)}
+        </div>
+        <div style={{ display: 'flex' }}>
+          <RaisedButton
+            type="button"
+            label="Edit Section"
+            style={{ margin: 8, flex: '1 1 auto' }}
+            onTouchTap={() => dispatch(startEdit(_id))}
+          />
+        </div>
+        {editing &&
+          <AdminSectionEdit
+            item={item}
+            page={page}
+          />
+        }
       </section>
-      <section style={{ display: 'flex' }}>
-        <RaisedButton
-          type="button"
-          label="Edit Section"
-          style={{ margin: 8, flex: '1 1 auto' }}
-          onTouchTap={() => dispatch(startEdit(_id))}
-        />
-      </section>
-      {editing &&
-        <AdminSectionEdit
-          item={item}
-          page={page}
-        />
-      }
     </div>
   )
 }

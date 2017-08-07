@@ -25,7 +25,7 @@ const pageContainer = (ComposedComponent) => {
   }) => {
     const isFetching = pages.isFetching || sections.isFetching ? true : false
     const slug = params.slug || 'home'
-    const page = pages.items.find(page => page.slug === slug)
+    const page = !isFetching && pages.items.find(page => page.slug === slug)
     const pageSlug = page ? page.slug : 'notFound'
     return {
       isFetching,
