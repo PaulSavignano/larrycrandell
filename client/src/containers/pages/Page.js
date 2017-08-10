@@ -13,7 +13,7 @@ class Page extends Component {
       const timeoutId = setTimeout(() => {
         const id = hash.replace('#', '');
         const element = document.getElementById(id);
-        if (element) element.scrollIntoView();
+        if (element) element.scrollIntoView({block: "start", behavior: "smooth"});
       }, 300);
       this.setState({ timeoutId })
     } else {
