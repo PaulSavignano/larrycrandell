@@ -8,6 +8,8 @@ import RaisedButton from 'material-ui/RaisedButton'
 import SuccessableButton from '../../components/buttons/SuccessableButton'
 import { fetchAddToCart } from '../../actions/cart'
 
+
+
 class ProductButtons extends Component {
   state = {
     qty: 1,
