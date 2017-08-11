@@ -30,7 +30,7 @@ orders.post('/', authenticate(['user']), (req, res, next) => {
       }
       const stripe = require("stripe")(process.env.STRIPE_SK_TEST)
       stripe.charges.create({
-        amount: cart.total,
+        amount: Math.round(cart.total),
         currency: "usd",
         source: token,
         description: `${process.env.APP_NAME} Order`
