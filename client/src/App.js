@@ -5,9 +5,12 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import { Helmet } from "react-helmet"
 
+
 import Main from './Main'
 
+
 injectTapEventPlugin()
+
 
 class App extends Component {
   render() {
