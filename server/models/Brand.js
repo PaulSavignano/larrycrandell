@@ -116,6 +116,8 @@ const BrandSchema = new Schema({
       button2Color: { type: String, trim: true },
       button1BackgroundColor: { type: String, trim: true },
       button2BackgroundColor: { type: String, trim: true },
+      button1BorderColor: { type: String, trim: true },
+      button2BorderColor: { type: String, trim: true },
       h1Align: { type: String, trim: true, default: 'center' },
       h1Color: { type: String, trim: true, default: 'rgba(255, 255, 255, .87)'},
       h1TextShadow: { type: String, trim: true },
