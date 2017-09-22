@@ -1,23 +1,14 @@
 import { SubmissionError } from 'redux-form'
 
-import * as sectionActions from './sections'
+import * as pageActions from './pages'
+import { startEdit, stopEdit } from './editItem'
 
 export const type = 'CARD'
 const route = 'cards'
 
-const START_EDIT = `START_EDIT_${type}`
-const STOP_EDIT = `STOP_EDIT_${type}`
-const ADD = `ADD_${type}`
-const REQUEST = `REQUEST_${type}S`
-const RECEIVE = `RECEIVE_${type}S`
-const UPDATE = `UPDATE_${type}`
-const DELETE = `DELETE_${type}`
-const DELETES = `DELETE_${type}S`
 const ERROR = `ERROR_${type}`
 
 // Create
-const fetchAddSuccess = (item) => ({ type: ADD, item })
-const fetchAddFailure = (error) => ({ type: ERROR, error })
 export const fetchAdd = (add) => {
   return (dispatch, getState) => {
     return fetch(`/api/${route}`, {
@@ -28,58 +19,23 @@ export const fetchAdd = (add) => {
       },
       body: JSON.stringify(add)
     })
-      .then(res => {
-        if (res.ok) return res.json()
-        throw new Error('Network response was not ok.')
-      })
+      .then(res => res.json())
       .then(json => {
         if (json.error) return Promise.reject(json.error)
-        const { card, section } = json
-        dispatch(fetchAddSuccess(card))
-        dispatch(sectionActions.fetchUpdateSuccess(section))
+        const { editItem, page } = json
+        dispatch(pageActions.fetchUpdateSuccess(page))
+        return dispatch(startEdit({ item: editItem, kind: 'CARD' }))
       })
-      .catch(err => {
-        console.log(err)
-        dispatch(fetchAddFailure(err))
-        throw new SubmissionError({ ...err, _error: 'Update failed!' })
+      .catch(error => {
+        console.log(error)
+        dispatch({ type: ERROR, error })
+        throw new SubmissionError({ ...error, _error: 'Update failed!' })
     })
   }
 }
-
-
-
-// Read
-const fetchCardsRequest = () => ({ type: REQUEST })
-const fetchCardsSuccess = (items) => ({ type: RECEIVE, items })
-const fetchCardsFailure = (error) => ({ type: ERROR, error })
-export const fetchCards = () => {
-  return (dispatch, getState) => {
-    dispatch(fetchCardsRequest())
-    return fetch(`/api/${route}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    })
-      .then(res => {
-        if (res.ok) return res.json()
-        throw new Error('Network response was not ok.')
-      })
-      .then(json => {
-        if (json.error) return Promise.reject(json.error)
-        dispatch(fetchCardsSuccess(json))
-      })
-      .catch(err => {
-        dispatch(fetchCardsFailure(err))
-      })
-  }
-}
-
 
 
 // Update
-const fetchUpdateSuccess = (item) => ({ type: UPDATE, item })
-const fetchUpdateFailure = (error) => ({ type: ERROR, error })
 export const fetchUpdate = (_id, update) => {
   return (dispatch, getState) => {
     return fetch(`/api/${route}/${_id}`, {
@@ -90,17 +46,16 @@ export const fetchUpdate = (_id, update) => {
       },
       body: JSON.stringify(update)
     })
-      .then(res => {
-        if (res.ok) return res.json()
-        throw new Error('Network response was not ok.')
-      })
+      .then(res => res.json())
       .then(json => {
         if (json.error) return Promise.reject(json.error)
-        dispatch(fetchUpdateSuccess(json))
+        const { page } = json
+        dispatch(pageActions.fetchUpdateSuccess(page))
+        return dispatch(stopEdit())
       })
-      .catch(err => {
-        dispatch(fetchUpdateFailure(err))
-        throw new SubmissionError({ ...err, _error: 'Update failed!' })
+      .catch(error => {
+        dispatch({ type: ERROR, error })
+        throw new SubmissionError({ ...error, _error: 'Update failed!' })
       })
   }
 }
@@ -108,8 +63,6 @@ export const fetchUpdate = (_id, update) => {
 
 
 // Delete
-const fetchDeleteSuccess = (_id) => ({ type: DELETE, _id })
-const fetchDeleteFailure = (error) => ({ type: ERROR, error })
 export const fetchDelete = (_id) => {
   return (dispatch, getState) => {
     return fetch(`/api/${route}/${_id}`, {
@@ -119,30 +72,16 @@ export const fetchDelete = (_id) => {
         'x-auth': localStorage.getItem('token'),
       },
     })
-      .then(res => {
-        if (res.ok) return res.json()
-        throw new Error('Network response was not ok.')
-      })
+      .then(res => res.json())
       .then(json => {
         if (json.error) return Promise.reject(json.error)
-        const { card, section } = json
-        dispatch(sectionActions.fetchUpdateSuccess(section))
-        dispatch(fetchDeleteSuccess(card._id))
+        const { page } = json
+        dispatch(pageActions.fetchUpdateSuccess(page))
+        dispatch(stopEdit())
       })
-      .catch(err => {
-        dispatch(fetchDeleteFailure(err))
-        throw new SubmissionError({ ...err, _error: 'Delete failed!' })
+      .catch(error => {
+        dispatch({ type: ERROR, error })
+        throw new SubmissionError({ ...error, _error: 'Delete failed!' })
       })
   }
 }
-
-export const deletes = (items) => {
-  return {
-    type: DELETES,
-    items
-  }
-}
-
-
-export const startEdit = (_id) => ({ type: START_EDIT, _id })
-export const stopEdit = (_id) => ({ type: STOP_EDIT, _id })

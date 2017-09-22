@@ -11,11 +11,13 @@ const CartSchema = new Schema({
     image: {
       src: { type: String, minlength: 1, trim: true }
     },
+    productSlug: { type: String },
     name: { type: String, required: true },
     price: { type: Number, required: true },
     total: { type: Number }
   }],
-  createdAt: { type: Date, default: Date.now }
+}, {
+  timestamps: true
 })
 
 const Cart = mongoose.model('Cart', CartSchema)

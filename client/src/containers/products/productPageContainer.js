@@ -1,25 +1,50 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 const productPageContainer = (ComposedComponent) => {
-  class Container extends Component {
+  class ProductPageContainer extends Component {
     render() {
-      const { isFetching, item } = this.props
+      const {
+        dispatch,
+        isFetching,
+        item,
+        primary1Color,
+        productStyle
+      } = this.props
+      const props = {
+        dispatch,
+        item,
+        productStyle,
+        primary1Color,
+      }
       return (
-        !isFetching && item &&
-        <ComposedComponent {...this.props} />
+        !isFetching && item ?
+        <ComposedComponent {...props} />
+        :
+        null
       )
     }
   }
   const mapStateToProps = ({
-    products: { items, isFetching } 
+    brand,
+    products
   }, {
-    params: { productId }
+    match: { params: { productId }}
   }) => ({
-    isFetching,
-    item: items.find(item => item._id === productId)
+    isFetching: brand.isFetching || products.isFetching ? true : false,
+    productStyle: brand.productStyle,
+    primary1Color: brand.palette.values.primary1Color,
+    item: products.items.find(item => item._id === productId)
   })
-  return connect(mapStateToProps)(Container)
+  ProductPageContainer.propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    isFetching: PropTypes.bool.isRequired,
+    item: PropTypes.object,
+    primary1Color: PropTypes.string.isRequired,
+    productStyle: PropTypes.object
+  }
+  return connect(mapStateToProps)(ProductPageContainer)
 }
 
 export default productPageContainer

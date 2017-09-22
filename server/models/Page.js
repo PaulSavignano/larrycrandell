@@ -1,26 +1,33 @@
 import mongoose, { Schema } from 'mongoose'
 
 import Section from './Section'
-import Slide from './Slide'
 
 const PageSchema = new Schema({
-  name: { type: String, trim: true, minlength: 1 },
   slug: { type: String },
-  sections: [{
-    sectionId: { type: Schema.Types.ObjectId },
-  }]
+  sections: [{ type: Schema.Types.ObjectId, ref: 'Section' }],
+  values: {
+    name: { type: String, trim: true, minlength: 1 }
+  },
 }, {
   timestamps: true
 })
 
-PageSchema.pre('remove', function(next) {
-  const page = this
-  if (page.sections.length) {
-    Section.find({ pageId: page._id })
-      .then(items => items.map(item => item.remove()
-      .catch(err => console.error(err))
-    ))
-  }
+function autopopulate(next) {
+  this.populate({
+    path: 'sections',
+    populate: { path: 'items.item' }
+  })
+  next();
+}
+
+PageSchema.pre('find', autopopulate)
+PageSchema.pre('findOne', autopopulate)
+
+PageSchema.post('findOneAndRemove', function(doc, next) {
+  doc.sections.forEach(section => {
+    return Section.findOneAndRemove({ _id: section })
+    .catch(error => console.log(error))
+  })
   next()
 })
 

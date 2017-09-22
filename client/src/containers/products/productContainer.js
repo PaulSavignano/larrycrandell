@@ -1,19 +1,22 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 const productContainer = (ComposedComponent) => {
-  class Container extends Component {
+  class ProductContainer extends Component {
     state = {
-      zDepth: 1
+      elevation: 1
     }
-    handleMouseEnter = () => this.setState({ zDepth: 4 })
-    handleMouseLeave = () => this.setState({ zDepth: 1 })
+    handleMouseEnter = () => this.setState({ elevation: 4 })
+    handleMouseLeave = () => this.setState({ elevation: 1 })
     render() {
-      const { zDepth } = this.state
+      const { elevation } = this.state
       const {
         dispatch,
         isFetching,
-        item
+        item,
+        primary1Color,
+        productStyle
       } = this.props
       const events = {
         onMouseEnter: this.handleMouseEnter,
@@ -22,19 +25,36 @@ const productContainer = (ComposedComponent) => {
       const props = {
         dispatch,
         item,
-        zDepth,
-        events
+        elevation,
+        events,
+        primary1Color,
+        productStyle
       }
       return (
-        !isFetching && item && <ComposedComponent {...props} />
+        !isFetching && item ? <ComposedComponent {...props} /> : null
       )
     }
   }
-  const mapStateToProps = ({ products: { items, isFetching } }, { componentId }) => ({
-    item: items.find(item => item._id === componentId),
+  const mapStateToProps = ({
+    brand: { isFetching, productStyle, palette, typography }
+  }, {
+    item
+  }) => ({
+    primary1Color: palette.values.primary1Color,
+    productStyle,
     isFetching,
+    item,
+    typography
   })
-  return connect(mapStateToProps)(Container)
+  ProductContainer.propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    item: PropTypes.object.isRequired,
+    isFetching: PropTypes.bool.isRequired,
+    primary1Color: PropTypes.string.isRequired,
+    productStyle: PropTypes.object.isRequired,
+    typography: PropTypes.object.isRequired
+  }
+  return connect(mapStateToProps)(ProductContainer)
 }
 
 export default productContainer

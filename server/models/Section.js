@@ -1,74 +1,60 @@
 import mongoose, { Schema } from 'mongoose'
 
-import { uploadFile, deleteFile } from '../middleware/s3'
+import Article from './Article'
 import Card from './Card'
-import Iframe from './Iframe'
-import Image from './Image'
+import Hero from './Hero'
 import Product from './Product'
-import Text from './Text'
-import Title from './Title'
 
-const s3Path = `${process.env.APP_NAME}/sections/section_`
+import { deleteFiles } from '../middleware/s3'
 
 const SectionSchema = new Schema({
-  pageId: { type: Schema.Types.ObjectId, ref: 'Page' },
-  pageSlug: { type: String },
-  index: { type: Number },
   image: {
-    src: { type: String },
+    src: { type: String, trim: true },
     width: { type: Number, trim: true, default: 1920 },
-    height: { type: Number, trim: true, default: 1080 },
+    height: { type: Number, trim: true, default: 1080 }
   },
+  items: [{
+    kind: { type: String, trim: true },
+    item: { type: Schema.ObjectId, refPath: 'items.kind' }
+  }],
+  page: { type: Schema.ObjectId, ref: 'Page' },
+  pageSlug: { type: String, trim: true },
   values: {
+    alignItems: { type: String, trim: true },
     backgroundColor: { type: String, trim: true },
     containerMarginTop: { type: String, trim: true },
     flexFlow: { type: String, trim: true, default: 'row wrap' },
     justifyContent: { type: String, trim: true, default: 'space-between' },
-    alignItems: { type: String, trim: true },
-    margin: { type: String, trim: true },
-    minHeight: { type: String, trim: true },
-    padding: { type: String, trim: true, default: '0 8px' }
-  },
-  components: [{
-    componentId: { type: Schema.Types.ObjectId, refPath: 'components.type' },
-    index: { type: Number },
-    type: { type: String }
-  }],
+    kind: { type: String, trim: true, default: 'Flex' },
+    margin: { type: String, trim: true, default: '0 auto' },
+    maxWidth: { type: String, trim: true, default: '1044px' },
+    minHeight: { type: String, trim: true, default: '120px' },
+    padding: { type: String, trim: true },
+    pageLink: { type: String, trim: true }
+  }
 }, {
   timestamps: true
 })
 
-SectionSchema.pre('remove', function(next) {
-  const section = this
-  if (section.image && section.image.src) {
-    deleteFile({ Key: section.image.src }).catch(err => console.error(err))
+
+SectionSchema.post('findOneAndRemove', function(doc, next) {
+  if (doc.image && doc.image.src) {
+    deleteFile({ Key: doc.image.src }).catch(err => console.error(err))
   }
-  section.components.map(component => {
-    switch(component.type) {
+  doc.items.forEach(item => {
+    switch(item.kind) {
+      case 'Article':
+        return Article.findOneAndRemove({ _id: item.item })
+        .catch(error => console.error({ error }))
       case 'Card':
-        Card.find({ sectionId: section._id })
-          .then(items => items.map(item => item.remove().catch(err => console.error(err))))
-        break
-      case 'Iframe':
-        Iframe.find({ sectionId: section._id })
-          .then(items => items.map(item => item.remove().catch(err => console.error(err))))
-        break
-      case 'Image':
-        Image.find({ sectionId: section._id })
-          .then(items => items.map(item => item.remove().catch(err => console.error(err))))
-        break
+        return Card.findOneAndRemove({ _id: item.item })
+        .catch(error => console.error({ error }))
+      case 'Hero':
+        return Hero.findOneAndRemove({ _id: item.item })
+        .catch(error => console.error({ error }))
       case 'Product':
-        Product.find({ sectionId: section._id })
-          .then(items => items.map(item => item.remove().catch(err => console.error(err))))
-        break
-      case 'Text':
-        Text.find({ sectionId: section._id })
-          .then(items => items.map(item => item.remove().catch(err => console.error(err))))
-        break
-      case 'Title':
-        Title.find({ sectionId: section._id })
-          .then(items => items.map(item => item.remove().catch(err => console.error(err))))
-        break
+        return Product.findOneAndRemove({ _id: item.item })
+        .catch(error => console.error({ error }))
       default:
         return
     }

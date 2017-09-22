@@ -1,40 +1,51 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import NotFound from '../../components/NotFound'
+import NotFoundPage from '../../components/not-found/NotFoundPage'
 
 const pageContainer = (ComposedComponent) => {
-  class Container extends Component {
+  class PageContainer extends Component {
     render() {
-      const { dispatch, isFetching, page, pageSlug, sections } = this.props
-      const props = { dispatch, page, sections }
+      const {
+        dispatch,
+        isFetching,
+        page,
+        pageSlug,
+      } = this.props
+      const props = {
+        dispatch,
+        page,
+      }
+      console.log('containering')
       return (
         isFetching ? null : pageSlug === 'notFound' ?
-        <NotFound />
+        <NotFoundPage />
         :
         <ComposedComponent {...props} />
       )
     }
   }
   const mapStateToProps = ({
-    pages,
-    sections,
-    slides
+    pages: { items, isFetching }
   }, {
-    params
+    match: { params: { slug }},
   }) => {
-    const isFetching = pages.isFetching || sections.isFetching ? true : false
-    const slug = params.slug || 'home'
-    const page = !isFetching && pages.items.find(page => page.slug === slug)
-    const pageSlug = page ? page.slug : 'notFound'
+    const pageSlug = slug || 'home'
+    const page = items.find(page => page.slug === pageSlug)
     return {
       isFetching,
       page,
-      pageSlug,
-      sections: !isFetching && page ? page.sections.map(section => sections.items.find(item => item._id === section.sectionId)) : {},
+      pageSlug: page ? page.slug : 'notFound',
     }
   }
-  return connect(mapStateToProps)(Container)
+  PageContainer.propTypes = {
+    dispatch: PropTypes.func.isRequired,
+    isFetching: PropTypes.bool.isRequired,
+    page: PropTypes.object,
+    pageSlug: PropTypes.string,
+  }
+  return connect(mapStateToProps)(PageContainer)
 }
 
 export default pageContainer

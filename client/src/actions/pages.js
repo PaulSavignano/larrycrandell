@@ -1,5 +1,7 @@
 import { SubmissionError } from 'redux-form'
 
+import { fetchProducts } from './products'
+
 export const type = 'PAGE'
 const route = 'pages'
 
@@ -23,17 +25,14 @@ export const fetchAdd = (add) => {
       },
       body: JSON.stringify(add)
     })
-      .then(res => {
-        if (res.ok) return res.json()
-        throw new Error('Network response was not ok.')
-      })
+      .then(res => res.json())
       .then(json => {
         if (json.error) return Promise.reject(json.error)
         dispatch(fetchAddSuccess(json))
       })
-      .catch(err => {
-        dispatch(fetchAddFailure(err))
-        throw new SubmissionError({ ...err, _error: 'Update failed!' })
+      .catch(error => {
+        dispatch(fetchAddFailure(error))
+        throw new SubmissionError({ ...error, _error: 'Update failed!' })
     })
   }
 }
@@ -53,16 +52,14 @@ export const fetchPages = () => {
         'Content-Type': 'application/json',
       }
     })
-      .then(res => {
-        if (res.ok) return res.json()
-        throw new Error('Network response was not ok.')
-      })
+      .then(res => res.json())
       .then(json => {
         if (json.error) return Promise.reject(json.error)
         dispatch(fetchPagesSuccess(json))
       })
-      .catch(err => {
-        dispatch(fetchPagesFailure(err))
+      .catch(error => {
+        console.log(error)
+        dispatch(fetchPagesFailure(error))
       })
   }
 }
@@ -82,17 +79,14 @@ export const fetchUpdate = (_id, update) => {
       },
       body: JSON.stringify(update)
     })
-      .then(res => {
-        if (res.ok) return res.json()
-        throw new Error('Network response was not ok.')
-      })
+      .then(res => res.json())
       .then(json => {
         if (json.error) return Promise.reject(json.error)
         dispatch(fetchUpdateSuccess(json))
       })
-      .catch(err => {
-        dispatch(fetchUpdateFailure(err))
-        throw new SubmissionError({ ...err, _error: 'Update failed!' })
+      .catch(error => {
+        dispatch(fetchUpdateFailure(error))
+        throw new SubmissionError({ ...error, _error: 'Update failed!' })
       })
   }
 }
@@ -111,17 +105,15 @@ export const fetchDelete = (_id) => {
         'x-auth': localStorage.getItem('token'),
       },
     })
-      .then(res => {
-        if (res.ok) return res.json()
-        throw new Error('Network response was not ok.')
-      })
+      .then(res => res.json())
       .then(json => {
         if (json.error) return Promise.reject(json.error)
+        dispatch(fetchProducts())
         dispatch(fetchDeleteSuccess(json._id))
       })
-      .catch(err => {
-        dispatch(fetchDeleteFailure(err))
-        throw new SubmissionError({ ...err, _error: 'Delete failed!' })
+      .catch(error => {
+        dispatch(fetchDeleteFailure(error))
+        throw new SubmissionError({ ...error, _error: 'Delete failed!' })
       })
   }
 }

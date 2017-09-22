@@ -1,7 +1,6 @@
 /* global Stripe */
 import { getStripeToken } from '../utils/getStripeToken'
 import { SubmissionError } from 'redux-form'
-import { push } from 'react-router-redux'
 
 import { fetchDeleteCart } from './cart'
 
@@ -16,40 +15,99 @@ const DELETE = `DELETE_${type}S`
 const ERROR = `ERROR_${type}`
 
 
+
+const handleErrorField = (fieldError, buttonError) => {
+  throw new SubmissionError({ ...fieldError, _error: buttonError })
+}
+
+
+
 const fetchAddOrderSuccess = (item) => ({ type: ADD, item })
 const fetchAddOrderFailure = (error) => ({ type: ERROR, error })
-export const fetchAddOrder = (order) => {
+export const fetchAddOrder = ({
+  cart,
+  history,
+  values: {
+    cvc,
+    exp,
+    fullAddress,
+    number,
+    name,
+    phone,
+    street,
+    city,
+    state,
+    zip,
+  }
+}) => {
   return (dispatch, getState) => {
     Stripe.setPublishableKey('pk_test_TAIO4tEnJzNuQkmjuWwcznSK')
-    const { number, exp, cvc } = order
     const expiration = exp.split('/')
     const exp_month = parseInt(expiration[0], 10)
     const exp_year = parseInt(expiration[1], 10)
     const card = { number, exp_month, exp_year, cvc }
     return getStripeToken(card)
-      .then(token => {
-        fetch('/api/orders', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-auth': localStorage.getItem('token')
-          },
-          body: JSON.stringify({ token, ...order })
+    .then(token => {
+      return fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth': localStorage.getItem('token')
+        },
+        body: JSON.stringify({
+          token,
+          fullAddress,
+          name,
+          phone,
+          street,
+          city,
+          state,
+          zip,
+          cart
         })
-          .then(res => res.json())
-          .then(json => {
-            console.log(json)
-            if (json.error) return Promise.reject(json.error)
-            dispatch(fetchAddOrderSuccess(json))
-            dispatch(fetchDeleteCart())
-            return dispatch(push(`/user/order/${json._id}`))
-          })
-          .catch(err => {
-            console.error(err)
-            dispatch(fetchAddOrderFailure(err))
-            throw new SubmissionError({ ...err, _error: err })
-          })
       })
+      .then(response => {
+        return response.json()
+        .then(json => {
+          if (response.ok) {
+            return json
+          } else {
+            return Promise.reject(json.error)
+          }
+        })
+      })
+      .then(json => {
+        dispatch(fetchAddOrderSuccess(json))
+        dispatch(fetchDeleteCart())
+        return history.push(`/user/order/${json._id}`)
+      })
+      .catch(error => Promise.reject(error))
+    })
+    .catch(error => {
+      let fieldError, buttonError
+      if (typeof error === 'string') {
+        if (error.indexOf('expiration') >= 0) {
+          fieldError = { exp: error }
+          buttonError = error
+        } else if (error.indexOf('security') >= 0) {
+          fieldError = { cvc: error }
+          buttonError = error
+        } else if (error.indexOf('number') >= 0) {
+          fieldError = { number: error }
+          buttonError = error
+        } else {
+          fieldError: null,
+          buttonError = 'Checkout failed'
+        }
+      } else if (typeof error === 'object') {
+        if (error.message) {
+          fieldError = { number: error.message }
+          buttonError = 'Charge failed'
+        }
+      }
+      dispatch(fetchAddOrderFailure(error))
+      return handleErrorField(fieldError, buttonError)
+    })
   }
 }
 
@@ -62,7 +120,7 @@ export const fetchAddOrder = (order) => {
 
 
 const fetchOrdersRequest = () => ({ type: REQUEST })
-const fetchOrdersSuccess = (items) => ({ type: RECEIVE, items })
+export const fetchOrdersSuccess = (items) => ({ type: RECEIVE, items })
 const fetchOrdersFailure = (error) => ({ type: ERROR, error })
 export const fetchOrders = () => {
   return (dispatch, getState) => {
@@ -74,15 +132,12 @@ export const fetchOrders = () => {
         'x-auth': localStorage.getItem('token'),
       }
     })
-      .then(res => {
-        if (res.ok) return res.json()
-        throw new Error('Network response was not ok.')
-      })
+      .then(res => res.json())
       .then(json => {
         if (json.error) return Promise.reject(json.error)
         dispatch(fetchOrdersSuccess(json))
       })
-      .catch(err => dispatch(fetchOrdersFailure(err)))
+      .catch(error => dispatch(fetchOrdersFailure(error)))
   }
 }
 
@@ -109,9 +164,9 @@ export const fetchUpdate = (_id, update) => {
         if (json.error) return Promise.reject(json.error)
         dispatch(fetchUpdateSuccess(json))
       })
-      .catch(err => {
-        dispatch(fetchUpdateFailure(err))
-        throw new SubmissionError({ ...err, _error: 'Update failed!' })
+      .catch(error => {
+        dispatch(fetchUpdateFailure(error))
+        throw new SubmissionError({ ...error, _error: 'Update failed!' })
       })
   }
 }

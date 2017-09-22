@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
 import CircularProgress from 'material-ui/CircularProgress'
+import Checkbox from 'material-ui/Checkbox'
 
 import ImageEditor from './ImageEditor'
 
@@ -26,33 +28,47 @@ class ImageForm extends Component {
   state = {
     position: { x: 0.5, y: 0.5 },
     scale: 1,
+    resizeProportionally: true,
     rotate: 0,
     borderRadius: 0,
     opacity: 1,
     editing: false,
     src: null,
     width: null,
+    maxWidth: null,
     height: null,
+    maxHeight: null,
     gradientY0: 0,
     gradientY1: 0,
     loading: false
   }
+  handleImage = (image) => {
+    if (image && image.src) {
+      this.setState({
+        src: image.src,
+        width: image.width,
+        height: image.height,
+        maxWidth: image.width,
+        maxHeight: image.height
+      })
+    }
+  }
   componentWillMount() {
     const { image } = this.props
-    if (image && image.src) {
-      this.setState({ src: image.src, width: image.width, height: image.height })
-    } else if (image && image.width && image.height){
-      this.setState({ width: image.width, height: image.height })
-    } else {
-      return
+    this.handleImage(image)
+  }
+  componentWillReceiveProps({ image }) {
+    if (image.src && image.src !== this.props.image.src) {
+      this.handleImage(image)
     }
   }
   handleSave = () => {
+    const { width, height } = this.state
     const { type } = this.props
     const image = {
       src: this.editor.getImageScaledToCanvas().toDataURL(type, 1),
-      width: this.state.width,
-      height: this.state.height
+      width,
+      height
     }
     this.setState({ editing: false, ...image, submitted: false })
     return image
@@ -96,6 +112,43 @@ class ImageForm extends Component {
   handlePositionChange = position => {
     this.setState({ position })
   }
+  updateCheck = () => {
+    this.setState((oldState) => {
+      return {
+        resizeProportionally: !oldState.resizeProportionally,
+      }
+    })
+  }
+  handleWidth = (e) => {
+    const { height, width, resizeProportionally } = this.state
+    const newWidth = parseInt(e.target.value, 10)
+    if (resizeProportionally) {
+      const ratio = newWidth / width
+      const newHeight = height * ratio
+      this.setState({
+        width: newWidth,
+        height: newHeight
+      })
+    }
+    this.setState({
+      width: newWidth
+    })
+  }
+  handleHeight = (e) => {
+    const { height, width, resizeProportionally } = this.state
+    const newHeight = parseInt(e.target.value, 10)
+    if (resizeProportionally) {
+      const ratio = newHeight / height
+      const newWidth = width * ratio
+      this.setState({
+        width: newWidth,
+        height: newHeight
+      })
+    }
+    this.setState({
+      height: newHeight
+    })
+  }
   handleUpload = (e) => {
     e.preventDefault()
     const reader = new FileReader()
@@ -103,16 +156,44 @@ class ImageForm extends Component {
     if (file) {
       this.setState({ loading: true })
       reader.onload = (e) => {
-        this.setState({
-          ...this.state,
-          src: e.target.result,
-          editing: true,
-          loading: false
-        })
+        const img = new Image()
+        const src = e.target.result
+        img.src = e.target.result
+        img.onload = () => {
+          this.setState({
+            src,
+            width: img.width,
+            height: img.height,
+            editing: true,
+            loading: false,
+            maxWidth: img.width,
+            maxHeight: img.height,
+          })
+        }
+        img.src = src
         this.props.onImageEdit(true)
       }
       reader.readAsDataURL(file)
     }
+  }
+  handleImageRemove = () => {
+    const { src } = this.state
+    const { onImageRemove } = this.props
+    const image = { src }
+    this.setState({
+      ...this.state,
+      src: null,
+      editing: false
+    })
+    return onImageRemove(image)
+  }
+  renderLabel = () => {
+    const { width, height } = this.state
+    const { label } = this.props
+    if (width && height) {
+      return `Choose ${Math.round(width)} x ${Math.round(height)} ${label}`
+    }
+    return `Choose ${label}`
   }
   setEditorRef = (editor) => this.editor = editor
   render () {
@@ -129,11 +210,12 @@ class ImageForm extends Component {
       scale,
       src,
       width,
+      maxWidth,
+      maxHeight
     } = this.state
     const {
-      _id,
       fontFamily,
-      onImageDelete,
+      label,
     } = this.props
     return (
       <div style={{ display: 'flex', flexFlow: 'column' }}>
@@ -218,7 +300,7 @@ class ImageForm extends Component {
               <div style={formStyles.controlContainer}>
                 <label>Border radius: {borderRadius}</label>
                 <input
-                  name="scale"
+                  name="radius"
                   type="range"
                   onChange={this.handleBorderRadius}
                   min="0"
@@ -236,21 +318,29 @@ class ImageForm extends Component {
               </div>
 
               <div style={{ display: 'flex', flexFlow: 'row wrap' }}>
+                <Checkbox
+                  label="Resize Proportionally"
+                  checked={this.state.resizeProportionally}
+                  onCheck={this.updateCheck}
+                  style={{ alignSelf: 'flex-end', width: 'auto' }}
+                />
                 <TextField
                   hintText="Width"
                   floatingLabelText="Width"
                   type="number"
-                  value={width}
+                  max={maxWidth}
+                  value={Math.round(width)}
                   style={{ flex: '1 1 auto', margin: '0 8px' }}
-                  onChange={(e) => this.setState({ width: parseInt(e.target.value, 10) })}
+                  onChange={this.handleWidth}
                 />
                 <TextField
                   hintText="Height"
                   floatingLabelText="Height"
                   type="number"
-                  value={height}
+                  max={maxHeight}
+                  value={Math.round(height)}
                   style={{ flex: '1 1 auto', margin: '0 8px' }}
-                  onChange={(e) => this.setState({ height: parseInt(e.target.value, 10) })}
+                  onChange={this.handleHeight}
                 />
               </div>
 
@@ -260,7 +350,7 @@ class ImageForm extends Component {
         {!editing && src && <img src={src} alt="form" style={{ alignSelf: 'center', width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}/>}
         <div style={{ display: 'flex', flexFlow: 'row wrap', margin: 4 }}>
           <RaisedButton
-            label={loading ? <CircularProgress size={24} style={{ verticalAlign: 'middle' }} /> : `Choose ${width} x ${height} image`}
+            label={loading ? <CircularProgress size={24} style={{ verticalAlign: 'middle' }} /> : this.renderLabel()}
             labelPosition="before"
             containerElement="label"
             style={{ flex: '1 1 auto', margin: 4, fontFamily }}
@@ -273,14 +363,7 @@ class ImageForm extends Component {
           </RaisedButton>
           {this.state.src &&
             <RaisedButton
-              onTouchTap={() => {
-                this.setState({
-                  ...this.state,
-                  src: null,
-                  editing: false
-                })
-                return onImageDelete(_id, { type: 'DELETE_IMAGE', image: { src }})
-              }}
+              onTouchTap={this.handleImageRemove}
               type="button"
               label="Remove Image"
               className="delete-button"
@@ -292,6 +375,13 @@ class ImageForm extends Component {
       </div>
     )
   }
+}
+
+ImageForm.propTypes = {
+  fontFamily: PropTypes.object,
+  image: PropTypes.object,
+  onImageEdit: PropTypes.func.isRequired,
+  onImageRemove: PropTypes.func.isRequired
 }
 
 export default ImageForm

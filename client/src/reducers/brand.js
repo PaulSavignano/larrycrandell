@@ -2,17 +2,18 @@ import { type } from '../actions/brand'
 
 const brand = (state = {
   isFetching: false,
-  appBar: {
-    values: {}
-  },
-  business: {},
-  main: {
-    values: {}
-  },
-  footer: {
-    values: {}
-  },
-  theme: {}
+  appBar: { values: {}},
+  articleStyle: { values: {}},
+  bodyStyle: { values: {}},
+  business: { values: {}},
+  cardStyle: { values: {}},
+  footer: { values: {}},
+  heroStyle: { values: {}},
+  palette: { values: {}},
+  productStyle: { values: {}},
+  viewStyle: { values: {}},
+  theme: { values: {}},
+  typography: { values: {}}
 }, action) => {
   switch (action.type) {
     case `REQUEST_${type}S`:

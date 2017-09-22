@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Card, CardText } from 'material-ui/Card'
 
 import moment from 'moment'
@@ -22,6 +23,7 @@ const styles = {
 }
 
 const OrderDetail = ({
+  dispatch,
   order: {
     _id,
     cart: { items, subTotal, tax, total },
@@ -29,7 +31,7 @@ const OrderDetail = ({
     address: { name, phone, street, city, state, zip }
   }
 }) => (
-  <Card className="section">
+  <Card zDepth={0}>
     <CardText>
       <h1>Order Detail</h1>
       <div style={styles.orderDetail}>
@@ -66,11 +68,18 @@ const OrderDetail = ({
         </div>
       </div>
     </CardText>
-    <CardText>
-      <OrderCartList items={items} />
-    </CardText>
+    <div>
+      <OrderCartList
+        dispatch={dispatch}
+        items={items}
+      />
+    </div>
   </Card>
 )
 
+OrderDetail.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  order: PropTypes.object.isRequired,
+}
 
 export default OrderDetail

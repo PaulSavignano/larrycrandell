@@ -1,28 +1,32 @@
 import React from 'react'
-import { Link } from 'react-router'
+import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 import Paper from 'material-ui/Paper'
 import FontIcon from 'material-ui/FontIcon'
 
-import footerContainer1 from '../../containers/footer/footerContainer1'
-import loadImage from '../../containers/images/loadImage'
+import './Footer.css'
+import footerContainer from '../../containers/footer/footerContainer'
+import loadImage from '../images/loadImage'
 
 const Footer = ({
   business: {
-    name,
-    phone,
-    email,
-    street,
-    city,
-    state,
-    zip,
-    facebook,
-    github,
-    google,
-    instagram,
-    linkedin,
-    twitter,
-    yelp,
-    youtube
+    values: {
+      name,
+      phone,
+      email,
+      street,
+      city,
+      state,
+      zip,
+      facebook,
+      github,
+      google,
+      instagram,
+      linkedin,
+      twitter,
+      yelp,
+      youtube
+    }
   },
   item: {
     image,
@@ -53,7 +57,7 @@ const Footer = ({
           { phone && <div><a href={`tel:${phone.replace(/\D+/g, '')}`} style={{ textDecoration: 'none', color: 'inherit' }}>{phone}</a></div> }
           { email && <div>{email}</div> }
           { street && <div>{street}</div> }
-          { city && <div>{city}, {state}. {zip}</div> }
+          { city && <div>{city}, {state} {zip}</div> }
         </div>
       </div>
       {image && image.src ?
@@ -67,4 +71,9 @@ const Footer = ({
   </footer>
 )
 
-export default footerContainer1(loadImage(Footer))
+Footer.propTypes = {
+  business: PropTypes.object.isRequired,
+  item: PropTypes.object.isRequired,
+}
+
+export default footerContainer(loadImage(Footer))

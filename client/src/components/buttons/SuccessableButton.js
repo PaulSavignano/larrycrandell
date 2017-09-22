@@ -1,69 +1,159 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
 import RaisedButton from 'material-ui/RaisedButton'
 import CircularProgress from 'material-ui/CircularProgress'
 
+import successableButtonContainer from '../../containers/buttons/successableButtonContainer'
+
 class SuccessableButton extends Component {
   state = {
-    submitting: false,
-    submitted: false,
-    timeoutId: null
+    background: null,
+    disabled: null,
+    label: '',
   }
-  componentWillReceiveProps(nextProps) {
-    const { submitSucceeded, submitting } = nextProps
-    if (submitting) this.setState({ submitting: true })
-    if (submitSucceeded && this.state.submitting) {
-      const timeoutId = setTimeout(() => this.setState({ submitted: false }), 3000)
-      this.setState({ submitting: false, submitted: true, timeoutId })
+  componentWillMount() {
+    const {
+      backgroundColor,
+      valid,
+      label
+    } = this.props
+    this.setState({ background: backgroundColor, disabled: true, label })
+  }
+  componentWillReceiveProps({
+    backgroundColor,
+    dirty,
+    error,
+    imageEdit,
+    label,
+    reset,
+    submitSucceeded,
+    submitting,
+    successLabel,
+    valid
+  }) {
+    if (imageEdit) {
+      return this.setState({
+        background: backgroundColor,
+        disabled: false,
+        label,
+      })
     }
+
+    if (error) {
+      const timeoutId = setTimeout(() => {
+        clearTimeout(this.state.timeoutId)
+        this.setState({
+          background: backgroundColor,
+          label,
+          disabled: true,
+          label,
+          submitting: false
+        })
+        reset && reset()
+      }, 3000)
+      return this.setState({
+        background: 'rgb(244, 67, 54)',
+        disabled: false,
+        label: error,
+        timeoutId
+      })
+    }
+
+    if (dirty && valid) {
+      if (this.state.timeoutId) {
+        clearTimeout(this.state.timeoutId)
+      }
+      return this.setState({
+        background: backgroundColor,
+        disabled: false,
+        label,
+        timeoutId: null
+      })
+    }
+
+    if (dirty && !valid) {
+      if (this.state.timeoutId) {
+        clearTimeout(this.state.timeoutId)
+      }
+      return this.setState({
+        background: backgroundColor,
+        disabled: true,
+        label,
+        timeoutId: null
+      })
+    }
+
+    if (submitSucceeded) {
+      const timeoutId = setTimeout(() => {
+        clearTimeout(this.state.timeoutId)
+        this.setState({
+          background: backgroundColor,
+          disabled: true,
+          label,
+          submitting: false
+        })
+        reset && reset()
+      }, 3000)
+      return this.setState({
+        background: 'rgb(76, 175, 80)',
+        disabled: false,
+        label: successLabel,
+        timeoutId
+      })
+    }
+
+    if (!dirty && valid) {
+      if (this.state.timeoutId) {
+        clearTimeout(this.state.timeoutId)
+      }
+      return this.setState({
+        background: backgroundColor,
+        disabled: true,
+        label,
+        timeoutId: null
+      })
+    }
+
   }
   componentWillUnmount() {
     clearTimeout(this.state.timeoutId)
   }
-  renderLabel = (color, label, submitting, submitted, successLabel) => {
-    if (submitting) return <CircularProgress color={color} size={25} style={{ verticalAlign: 'middle' }} />
-    if (submitted) return successLabel
-    return label
-  }
   render() {
-    const { submitted } = this.state
     const {
-      backgroundColor,
+      submitting,
       color,
       fontFamily,
-      isFetching,
-      label,
-      submitting,
-      successLabel,
       style,
     } = this.props
-    const styles = style ? style : { margin: 8 }
     return (
-      !isFetching &&
       <RaisedButton
-        type="submit"
-        label={this.renderLabel(color, label, submitting, submitted, successLabel)}
+        backgroundColor={this.state.background}
+        className="button"
+        disabled={this.state.disabled}
+        label={submitting ? <CircularProgress color={color} size={25} style={{ verticalAlign: 'middle' }} /> : this.state.label}
         labelColor={color}
-        backgroundColor={submitted ? "#4CAF50" : backgroundColor }
-        style={{ flex: '1 1 auto', ...styles }}
         labelStyle={{ fontFamily }}
+        onTouchTap={this.handleTouchTap}
+        style={style}
+        type="submit"
       />
     )
   }
 }
 
-export default connect(
-  ({
-    brand: {
-      isFetching,
-      theme: {
-        palette: { canvasColor, fontFamily, primary1Color, }
-      }
-    }
-  }) => ({
-    backgroundColor: primary1Color,
-    color: canvasColor,
-    fontFamily,
-    isFetching
-  })
-)(SuccessableButton)
+SuccessableButton.propTypes = {
+  backgroundColor: PropTypes.string.isRequired,
+  color: PropTypes.string.isRequired,
+  dirty: PropTypes.bool.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  fontFamily: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  style: PropTypes.object,
+  reset: PropTypes.func,
+  submitSucceeded: PropTypes.bool.isRequired,
+  submitting: PropTypes.bool.isRequired,
+  successLabel: PropTypes.string.isRequired,
+  valid: PropTypes.bool.isRequired
+}
+
+export default successableButtonContainer(SuccessableButton)

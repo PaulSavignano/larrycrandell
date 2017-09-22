@@ -1,22 +1,26 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { push } from 'react-router-redux'
+import PropTypes from 'prop-types'
 import { Card, CardText } from 'material-ui/Card'
 import moment from 'moment'
 
+import history from '../../containers/routers/history'
 import formatPrice from '../../utils/formatPrice'
 import OrderCartList from './OrderCartList'
 
 class OrderItem extends Component {
   state = {
-    zDepth: 1,
+    elevation: 1,
   }
-  handleMouseEnter = () => this.setState({ zDepth: 4 })
-  handleMouseLeave = () => this.setState({ zDepth: 1 })
+  handleMouseEnter = () => this.setState({ elevation: 3 })
+  handleMouseLeave = () => this.setState({ elevation: 1 })
+  handleNavigation = () => {
+    const { order: { _id }} = this.props
+    return history.push(`/user/orders/${_id}`)
+  }
   render() {
     const {
       dispatch,
-      item: {
+      order: {
         _id,
         cart: { items },
         createdAt,
@@ -26,12 +30,11 @@ class OrderItem extends Component {
     } = this.props
     return (
       <Card
-        zDepth={this.state.zDepth}
+        zDepth={this.state.elevation}
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
-        onTouchTap={() => dispatch(push(`/user/orders/${_id}`))}
+        onTouchTap={this.handleNavigation}
         className="card"
-        style={{ margin: 16 }}
       >
         <CardText style={{ display: 'flex', flexFlow: 'row wrap', justifyContent: 'space-between' }}>
           <div>
@@ -51,11 +54,18 @@ class OrderItem extends Component {
             <div>{_id}</div>
           </div>
         </CardText>
-        <OrderCartList items={items} />
+        <OrderCartList
+          dispatch={dispatch}
+          items={items}
+        />
       </Card>
     )
   }
 }
 
+OrderItem.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  order: PropTypes.object.isRequired,
+}
 
-export default connect()(OrderItem)
+export default OrderItem
