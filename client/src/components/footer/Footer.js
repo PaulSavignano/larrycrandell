@@ -5,7 +5,7 @@ import Paper from 'material-ui/Paper'
 import FontIcon from 'material-ui/FontIcon'
 
 import './Footer.css'
-import footerContainer from '../../containers/footer/footerContainer'
+import footerContainer1 from '../../containers/footer/footerContainer1'
 import loadImage from '../images/loadImage'
 
 const Footer = ({
@@ -76,4 +76,4 @@ Footer.propTypes = {
   item: PropTypes.object.isRequired,
 }
 
-export default footerContainer(loadImage(Footer))
+export default footerContainer1(loadImage(Footer))
