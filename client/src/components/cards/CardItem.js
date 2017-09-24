@@ -11,7 +11,7 @@ const CardItem = (props) => {
     cardStyle,
     cursor,
     elevation,
-    item: {
+    item: { 
       _id,
       values: { flex }
     },
