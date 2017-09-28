@@ -42,7 +42,7 @@ export const fetchAddOrder = ({
   }
 }) => {
   return (dispatch, getState) => {
-    Stripe.setPublishableKey('pk_test_TAIO4tEnJzNuQkmjuWwcznSK')
+    Stripe.setPublishableKey('pk_test_LfaYiTKvAccIatPbsxCgNDIY')
     const expiration = exp.split('/')
     const exp_month = parseInt(expiration[0], 10)
     const exp_year = parseInt(expiration[1], 10)
