@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet"
 
 const Head = ({
   description,
+  keywords,
   image,
   isFetching,
   name
@@ -14,8 +15,10 @@ const Head = ({
     <meta charSet="utf-8" />
     {name && <title>{name}</title>}
     {description && <meta name="description" content={description} />}
-    {image && image.src ? <link rel="shortcut icon" href={image.src} /> : null}
-    {image && image.src ? <link rel="apple-touch-icon" sizes="180x180" href={image.src} /> : null}
+    {keywords && <meta name="keywords" content={keywords} />}
+    {image && image.src ? <link rel="apple-touch-icon" sizes="180x180" href={image.src} /> : null }
+    {image && image.src ? <link rel="icon" type="image/png" href={image.src} sizes="32x32" /> : null}
+    {image && image.src ? <link rel="icon" type="image/png" href={image.src} sizes="16x16" /> : null }
     <link rel="canonical" href={window.location.hostname} />
   </Helmet>
 )
@@ -26,13 +29,15 @@ const mapStateToProps = ({
       image,
       values: {
         name,
-        description
+        description,
+        keywords
       }
     },
     isFetching,
   }
 }) => ({
   description,
+  keywords,
   image,
   isFetching,
   name
