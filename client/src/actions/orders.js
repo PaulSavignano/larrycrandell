@@ -82,7 +82,7 @@ export const fetchAddOrder = ({
         dispatch(fetchAddOrderSuccess(order))
         if (user) dispatch(fetchUpdateUserSuccess(user))
         dispatch(fetchDeleteCart())
-        return history.push(`/user/order/${json._id}`)
+        return history.push(`/user/order/${order._id}`)
       })
       .catch(error => Promise.reject(error))
     })
