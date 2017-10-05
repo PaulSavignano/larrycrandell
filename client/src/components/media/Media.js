@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import './media.css'
 
 const Media = ({
+  className,
   border,
   boxShadow,
   flex,
@@ -12,14 +13,15 @@ const Media = ({
   margin
 }) => (
   <div
-    style={{ flex, margin }}
-    className="media-image-container"
+    style={{ border, flex, margin }}
+    className={className}
+    id="Media"
   >
     {image.src &&
       <img
         src={image.src}
         alt="card"
-        style={{ border, boxShadow }}
+        style={{ boxShadow }}
         className="media-image"
       />
     }
@@ -28,7 +30,7 @@ const Media = ({
         <iframe
           className="media-iframe"
           title="iframe"
-          style={{ border, boxShadow }}
+          style={{ boxShadow }}
           src={iframe}
           frameBorder="0"
           allowFullScreen
