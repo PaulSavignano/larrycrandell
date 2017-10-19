@@ -12,13 +12,16 @@ const formFields = [{
     { name: 'fontFamily', type: 'text' },
     { name: 'fontSize', type: 'text' },
     { name: 'fontWeight', type: 'text' },
-    { name: 'height', type: 'text' },
+    { name: 'imageBorderRadius', type: 'text' },
+    { name: 'imageElevation', type: 'number' },
     { name: 'imagePosition', type: 'select', options: [ 'absolute', 'relative' ]},
+    { name: 'imageWidth', type: 'text' },
     { name: 'letterSpacing', type: 'text' },
+    { name: 'phoneSize', type: 'text' },
     { name: 'name', type: 'text' },
     { name: 'navColor', type: 'text' },
     { name: 'showPhone', type: 'select', options: [ 'true', 'false' ] },
-    { name: 'textShadow', type: 'text' },
+    { name: 'textShadow', type: 'text' }
   ]
 }, {
   name: 'articleStyle',
@@ -40,8 +43,7 @@ const formFields = [{
     { name: 'h3TextShadow', type: 'text' },
     { name: 'pColor', type: 'text' },
     { name: 'mediaBorder', type: 'text' },
-    { name: 'mediaBoxShadow', type: 'text' },
-    { name: 'mediaElevation', type: 'number' },
+    { name: 'mediaElevation', type: 'number' }
   ]
 }, {
   name: 'bodyStyle',
@@ -64,6 +66,8 @@ const formFields = [{
     { name: 'city', type: 'text' },
     { name: 'state', type: 'state' },
     { name: 'zip', type: 'zip' },
+    { name: 'imageBorderRadius', type: 'text' },
+    { name: 'imageElevation', type: 'number' },
     { name: 'facebook', type: 'text' },
     { name: 'github', type: 'text' },
     { name: 'google', type: 'text' },
@@ -95,7 +99,7 @@ const formFields = [{
     { name: 'h3TextShadow', type: 'text' },
     { name: 'pColor', type: 'text' },
     { name: 'margin', type: 'text' },
-    { name: 'mediaBorder', type: 'text' },
+    { name: 'mediaBorder', type: 'text' }
   ]
 }, {
   name: 'footer',
@@ -104,7 +108,9 @@ const formFields = [{
     { name: 'color', type: 'text' },
     { name: 'borderTop', type: 'text' },
     { name: 'borderBottom', type: 'text' },
-    { name: 'margin', type: 'text' }
+    { name: 'imageBorderRadius', type: 'text' },
+    { name: 'imageElevation', type: 'number' },
+    { name: 'imageMargin', type: 'text' }
   ]
 }, {
   name: 'heroStyle',
@@ -130,7 +136,7 @@ const formFields = [{
     { name: 'pColor', type: 'text' },
     { name: 'mediaBorder', type: 'text' },
     { name: 'mediaElevation', type: 'number' },
-    { name: 'minHeight', type: 'text' },
+    { name: 'minHeight', type: 'text' }
   ]
 }, {
   name: 'palette',
@@ -148,7 +154,7 @@ const formFields = [{
     { name: 'borderColor', type: 'text' },
     { name: 'disabledColor', type: 'text' },
     { name: 'pickerHeaderColor', type: 'text' },
-    { name: 'shadowColor', type: 'text' },
+    { name: 'shadowColor', type: 'text' }
   ]
 }, {
   name: 'productStyle',
@@ -159,31 +165,26 @@ const formFields = [{
     { name: 'nameColor', type: 'text' },
     { name: 'nameTextShadow', type: 'text' },
     { name: 'margin', type: 'text' },
-    { name: 'mediaBoxShadow', type: 'text' },
-    { name: 'mediaElevation', type: 'text' },
+    { name: 'mediaElevation', type: 'text' }
   ]
 }, {
   name: 'typography',
   fields: [
     { name: 'fontFamily', type: 'text' },
+    { name: 'fontWeight', type: 'text' },
     { name: 'h1FontFamily', type: 'text' },
     { name: 'h1FontSize', type: 'text' },
-    { name: 'h1FontWeight', type: 'text' },
     { name: 'h1LetterSpacing', type: 'text' },
-    { name: 'h1LineHeight', type: 'text' },
     { name: 'h2FontFamily', type: 'text' },
     { name: 'h2FontSize', type: 'text' },
-    { name: 'h2FontWeight', type: 'text' },
     { name: 'h2LetterSpacing', type: 'text' },
-    { name: 'h2LineHeight', type: 'text' },
     { name: 'h3FontFamily', type: 'text' },
     { name: 'h3FontSize', type: 'text' },
-    { name: 'h3FontWeight', type: 'text' },
     { name: 'h3LetterSpacing', type: 'text' },
+    { name: 'lineHeight', type: 'text' },
     { name: 'pFontFamily', type: 'text' },
     { name: 'pFontSize', type: 'text' },
-    { name: 'pFontWeight', type: 'text' },
-    { name: 'pLetterSpacing', type: 'text' }
+    { name: 'pLetterSpacing', type: 'text' },
   ]
 }]
 
